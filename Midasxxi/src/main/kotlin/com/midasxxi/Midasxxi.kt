@@ -32,7 +32,7 @@ class Midasxxi : MainAPI() {
 
     override val mainPage = mainPageOf(
         "$mainUrl/page/" to "Latest Update",
-        "$mainUrl/tvshows/page/" to "Tv Series",
+        "$mainUrl/tvshows/page/" to "TV Series",
 
         "$mainUrl/genre/action/page/" to "Action",
         "$mainUrl/genre/anime/page/" to "Anime",
@@ -77,11 +77,10 @@ class Midasxxi : MainAPI() {
             val src = it.attr("data-src")
                 .ifBlank { it.attr("data-lazy-src") }
                 .ifBlank { it.attr("src") }
-
             if (src.isNotBlank()) return src.fixUrlSelf()
         }
 
-        el.attr("style")?.let { style ->
+        el.selectFirst("div.poster, div.image")?.attr("style")?.let { style ->
             Regex("url\\(['\"]?(.*?)['\"]?\\)")
                 .find(style)
                 ?.groupValues
@@ -107,24 +106,25 @@ class Midasxxi : MainAPI() {
         mainUrl = getBaseUrl(req.url)
 
         val items = req.document
-            .select("article.item")
+            .select("article.item, div.item")
             .mapNotNull { it.toSearchResult() }
 
         return newHomePageResponse(request.name, items)
     }
 
     private fun Element.toSearchResult(): SearchResponse? {
+
         val title =
-            selectFirst("img")?.attr("alt")
-                ?.ifBlank { selectFirst("h3,h2")?.text() }
-                ?.trim()
+            selectFirst("h3, h2, .title")?.text()?.trim()
+                ?: selectFirst("img")?.attr("alt")?.trim()
                 ?: return null
 
         val href = selectFirst("a")?.attr("href") ?: return null
         val poster = extractPoster(this)
 
         val type =
-            if (href.contains("/tv")) TvType.TvSeries else TvType.Movie
+            if (href.contains("/tv", true)) TvType.TvSeries
+            else TvType.Movie
 
         return newMovieSearchResponse(
             title,
@@ -162,9 +162,7 @@ class Midasxxi : MainAPI() {
         directUrl = getBaseUrl(req.url)
         val doc = req.document
 
-        val title =
-            doc.selectFirst("h1")?.text()?.trim() ?: "Unknown"
-
+        val title = doc.selectFirst("h1")?.text()?.trim() ?: "Unknown"
         val poster = extractPoster(doc)
         val plot = doc.selectFirst("div.wp-content p")?.text()
         val tags = doc.select("div.sgeneros a").map { it.text() }
@@ -256,7 +254,6 @@ class Midasxxi : MainAPI() {
         val rList = r.split("\\x")
         val decoded = base64Decode(m.reversed())
         var n = ""
-
         for (s in decoded.split("|")) {
             n += "\\x" + rList[s.toInt() + 1]
         }
