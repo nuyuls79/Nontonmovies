@@ -3,7 +3,6 @@ package com.midasxxi
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.LoadResponse.Companion.addActors
-import com.lagradost.cloudstream3.LoadResponse.Companion.addScore
 import com.lagradost.cloudstream3.LoadResponse.Companion.addTrailer
 import com.lagradost.cloudstream3.amap
 import com.lagradost.cloudstream3.extractors.helper.AesHelper
@@ -32,7 +31,7 @@ class Midasxxi : MainAPI() {
         TvType.AsianDrama
     )
 
-    // ================= MAIN PAGE (FIXED) =================
+    // ================= MAIN PAGE =================
 
     override val mainPage = mainPageOf(
         "$mainUrl/page/" to "Latest Update",
@@ -57,17 +56,39 @@ class Midasxxi : MainAPI() {
     private fun getBaseUrl(url: String): String =
         URI(url).let { "${it.scheme}://${it.host}" }
 
-    // ================= POSTER HELPER (FIX UTAMA) =================
+    // ================= LINK NORMALIZER (FIX ERROR) =================
+
+    private fun getProperLink(uri: String): String {
+        return when {
+            uri.contains("/episode/") -> {
+                var title = uri.substringAfter("/episode/")
+                title = Regex("(.+?)-season").find(title)?.groupValues?.get(1)
+                    ?: title.substringBefore("/")
+                "$mainUrl/tvseries/$title"
+            }
+
+            uri.contains("/season/") -> {
+                var title = uri.substringAfter("/season/")
+                title = Regex("(.+?)-season").find(title)?.groupValues?.get(1)
+                    ?: title.substringBefore("/")
+                "$mainUrl/tvseries/$title"
+            }
+
+            else -> uri
+        }
+    }
+
+    // ================= POSTER HELPER =================
 
     private fun extractPoster(el: Element): String? {
-        el.selectFirst("a.desktop img, a.poster_mobile img, img")?.let {
+        el.selectFirst("img")?.let {
             val src = it.attr("data-src")
                 .ifBlank { it.attr("data-lazy-src") }
                 .ifBlank { it.attr("src") }
             if (src.isNotBlank()) return fixUrl(src)
         }
 
-        val style = el.selectFirst(".slider_cover")?.attr("style") ?: ""
+        val style = el.attr("style")
         Regex("url\\(['\"]?(.*?)['\"]?\\)").find(style)?.groupValues?.get(1)?.let {
             return fixUrl(it)
         }
@@ -100,11 +121,7 @@ class Midasxxi : MainAPI() {
     }
 
     private fun Element.toSearchResult(): SearchResponse? {
-        val title =
-            selectFirst("img")?.attr("alt")
-                ?.ifBlank { selectFirst("h3, h2")?.text() }
-                ?.trim() ?: return null
-
+        val title = selectFirst("img")?.attr("alt")?.trim() ?: return null
         val href = selectFirst("a")?.attr("href") ?: return null
         val poster = extractPoster(this)
         val quality = getQualityFromString(selectFirst("span.quality")?.text())
@@ -112,7 +129,7 @@ class Midasxxi : MainAPI() {
         return newMovieSearchResponse(
             title,
             getProperLink(href),
-            TvType.Movie
+            if (href.contains("/tv")) TvType.TvSeries else TvType.Movie
         ) {
             posterUrl = poster
             this.quality = quality
@@ -154,15 +171,15 @@ class Midasxxi : MainAPI() {
 
         val poster = extractPoster(doc)
         val tags = doc.select("div.sgeneros > a").map { it.text() }
-        val year = Regex(",\\s?(\\d{4})").find(doc.text())?.groupValues?.get(1)?.toIntOrNull()
+        val year = Regex("\\b(19\\d{2}|20\\d{2})\\b")
+            .find(doc.text())?.value?.toIntOrNull()
 
         val tvType =
-            if (doc.select("ul#section").text().contains("Episodes")) TvType.TvSeries
-            else TvType.Movie
+            if (doc.select("ul#section").text().contains("Episodes"))
+                TvType.TvSeries else TvType.Movie
 
         val plot = doc.selectFirst("div.wp-content > p, div.content p")?.text()?.trim()
         val trailer = doc.selectFirst("iframe")?.attr("src")
-        val rating = doc.selectFirst("span.dt_rating_vgs")?.text()?.toDoubleOrNull()
 
         val actors = doc.select("div.persons div[itemprop=actor]").map {
             Actor(
@@ -189,7 +206,6 @@ class Midasxxi : MainAPI() {
                 this.year = year
                 this.plot = plot
                 this.tags = tags
-                rating?.let { this.score = Score.from10(it) }
                 addActors(actors)
                 addTrailer(trailer)
             }
@@ -201,14 +217,13 @@ class Midasxxi : MainAPI() {
                 this.year = year
                 this.plot = plot
                 this.tags = tags
-                rating?.let { this.score = Score.from10(it) }
                 addActors(actors)
                 addTrailer(trailer)
             }
         }
     }
 
-    // ================= LINKS (ASLI, TIDAK DIRUSAK) =================
+    // ================= LINKS =================
 
     override suspend fun loadLinks(
         data: String,
