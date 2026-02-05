@@ -52,13 +52,10 @@ class Midasxxi : MainAPI() {
     }
 
     private fun extractPoster(el: Element): String? {
-        val imgEl = el.selectFirst("img") ?: return null
-        val url =
-            imgEl.attr("data-src").ifBlank {
-                imgEl.attr("data-lazy-src").ifBlank {
-                    imgEl.attr("src")
-                }
-            }
+        val imgEl = el.selectFirst("a.desktop img")
+            ?: el.select("img").lastOrNull()
+            ?: return null
+        val url = imgEl.attr("src")
         return if (url.isNotBlank()) url.fixUrl() else null
     }
 
@@ -76,7 +73,7 @@ class Midasxxi : MainAPI() {
 
     private fun Element.toSearchResult(): SearchResponse? {
         val title = selectFirst("div.data h3 a")?.text()
-            ?: selectFirst("img")?.attr("alt")
+            ?: selectFirst("a.desktop img")?.attr("alt")
             ?: return null
 
         val href = selectFirst("a")?.attr("href")?.fixUrl() ?: return null
