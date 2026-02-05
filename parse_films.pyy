@@ -1,0 +1,29 @@
+import requests
+from bs4 import BeautifulSoup
+
+# URL halaman film
+url = "https://ssstik.tv/genre/action/"  # bisa diganti sesuai genre
+
+# Ambil konten website
+response = requests.get(url)
+if response.status_code != 200:
+    print("Gagal ambil data:", response.status_code)
+    exit()
+
+html = response.text
+
+# Parse dengan BeautifulSoup
+soup = BeautifulSoup(html, "html.parser")
+
+# Cari semua artikel film
+films = soup.find_all("article", class_="item movies")
+
+for film in films:
+    title = film.find("h3").text.strip()
+    link = film.find("a")["href"]
+    rating_tag = film.find("div", class_="rating")
+    rating = rating_tag.text.strip() if rating_tag else "N/A"
+    quality_tag = film.find("span", class_="quality")
+    quality = quality_tag.text.strip() if quality_tag else "N/A"
+    print(f"{title} | Rating: {rating} | Quality: {quality} | Link: {link}")	
+
