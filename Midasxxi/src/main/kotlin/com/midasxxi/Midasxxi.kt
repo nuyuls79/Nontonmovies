@@ -2,12 +2,9 @@ package com.midasxxi
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.lagradost.cloudstream3.*
-import com.lagradost.cloudstream3.LoadResponse.Companion.addActors
-import com.lagradost.cloudstream3.LoadResponse.Companion.addTrailer
 import com.lagradost.cloudstream3.amap
 import com.lagradost.cloudstream3.extractors.helper.AesHelper
 import com.lagradost.cloudstream3.utils.*
-import com.lagradost.cloudstream3.toNewSearchResponseList
 import org.jsoup.nodes.Element
 import java.net.URI
 
@@ -16,7 +13,7 @@ class Midasxxi : MainAPI() {
     override var mainUrl = "https://ssstik.tv"
     private var directUrl = mainUrl
 
-    override var name = "Midasxxi🍡"
+    override var name = "Midasxxi 🍡"
     override var lang = "id"
     override val hasMainPage = true
     override val hasDownloadSupport = true
@@ -54,20 +51,10 @@ class Midasxxi : MainAPI() {
     private fun getBaseUrl(url: String): String =
         URI(url).let { "${it.scheme}://${it.host}" }
 
-    private fun String.fixUrlSelf(): String {
+    private fun String.fixUrl(): String {
         if (startsWith("http")) return this
         if (startsWith("//")) return "https:$this"
         return mainUrl + this
-    }
-
-    private fun getProperLink(url: String): String {
-        return when {
-            url.contains("/episode/") || url.contains("/season/") -> {
-                val slug = url.substringAfterLast("/").substringBefore("-season")
-                "$mainUrl/tvseries/$slug"
-            }
-            else -> url
-        }
     }
 
     // ================= POSTER =================
@@ -77,36 +64,46 @@ class Midasxxi : MainAPI() {
             val src = it.attr("data-src")
                 .ifBlank { it.attr("data-lazy-src") }
                 .ifBlank { it.attr("src") }
-            if (src.isNotBlank()) return src.fixUrlSelf()
+            if (src.isNotBlank()) return src.fixUrl()
         }
-
-        el.selectFirst("div.poster, div.image")?.attr("style")?.let { style ->
-            Regex("url\\(['\"]?(.*?)['\"]?\\)")
-                .find(style)
-                ?.groupValues
-                ?.get(1)
-                ?.let { return it.fixUrlSelf() }
-        }
-
         return null
     }
 
-    // ================= HOMEPAGE =================
+    private fun Element.extractRating(): Int? {
+        val r = selectFirst("div.rating")?.text()
+            ?.replace(",", ".")
+            ?.toDoubleOrNull()
+            ?: return null
+        return (r * 10).toInt()
+    }
+
+    private fun Element.extractQuality(): SearchQuality? {
+        val q = selectFirst("span.quality")?.text()?.uppercase() ?: return null
+        return when {
+            q.contains("HD") -> SearchQuality.HD
+            q.contains("WEB") -> SearchQuality.WEB
+            q.contains("BLURAY") -> SearchQuality.BLURAY
+            q.contains("CAM") -> SearchQuality.CAM
+            else -> null
+        }
+    }
+
+    // ================= HOME =================
 
     override suspend fun getMainPage(
         page: Int,
         request: MainPageRequest
     ): HomePageResponse {
 
-        val req = if (page == 1)
+        val res = if (page == 1)
             app.get(request.data)
         else
             app.get("${request.data}$page/")
 
-        mainUrl = getBaseUrl(req.url)
+        mainUrl = getBaseUrl(res.url)
 
-        val items = req.document
-            .select("article.item, div.item")
+        val items = res.document
+            .select("article.item")
             .mapNotNull { it.toSearchResult() }
 
         return newHomePageResponse(request.name, items)
@@ -114,76 +111,59 @@ class Midasxxi : MainAPI() {
 
     private fun Element.toSearchResult(): SearchResponse? {
 
-        val title =
-            selectFirst("h3, h2, .title")?.text()?.trim()
-                ?: selectFirst("img")?.attr("alt")?.trim()
-                ?: return null
+        val title = selectFirst("div.data h3 a")?.text()?.trim()
+            ?: selectFirst("img")?.attr("alt")?.trim()
+            ?: return null
 
-        val href = selectFirst("a")?.attr("href") ?: return null
+        val href = selectFirst("a")?.attr("href")?.fixUrl() ?: return null
         val poster = extractPoster(this)
 
+        val rating = extractRating()
+        val quality = extractQuality()
+
         val type =
-            if (href.contains("/tv", true)) TvType.TvSeries
+            if (href.contains("/tvshows/")) TvType.TvSeries
             else TvType.Movie
 
-        return newMovieSearchResponse(
-            title,
-            getProperLink(href),
-            type
-        ) {
+        return newMovieSearchResponse(title, href, type) {
             posterUrl = poster
+            this.rating = rating
+            this.quality = quality
         }
     }
 
     // ================= SEARCH =================
 
     override suspend fun search(query: String, page: Int): SearchResponseList? {
-        val req = app.get("$mainUrl/search/$query/page/$page")
-        mainUrl = getBaseUrl(req.url)
+        val res = app.get("$mainUrl/search/$query/page/$page")
+        mainUrl = getBaseUrl(res.url)
 
-        val results = req.document.select("div.result-item").mapNotNull {
-            val a = it.selectFirst("div.title a") ?: return@mapNotNull null
-            val title = a.text().trim()
-            val href = getProperLink(a.attr("href"))
-            val poster = extractPoster(it)
+        val items = res.document
+            .select("article.item")
+            .mapNotNull { it.toSearchResult() }
 
-            newMovieSearchResponse(title, href, TvType.Movie) {
-                posterUrl = poster
-            }
-        }
-
-        return results.toNewSearchResponseList()
+        return items.toSearchResponseList()
     }
 
     // ================= LOAD =================
 
     override suspend fun load(url: String): LoadResponse {
-        val req = app.get(url)
-        directUrl = getBaseUrl(req.url)
-        val doc = req.document
+        val res = app.get(url)
+        directUrl = getBaseUrl(res.url)
 
+        val doc = res.document
         val title = doc.selectFirst("h1")?.text()?.trim() ?: "Unknown"
         val poster = extractPoster(doc)
         val plot = doc.selectFirst("div.wp-content p")?.text()
         val tags = doc.select("div.sgeneros a").map { it.text() }
 
-        val tvType =
-            if (doc.select("ul.episodios").isNotEmpty())
-                TvType.TvSeries
-            else
-                TvType.Movie
+        val isSeries = doc.select("ul.episodios").isNotEmpty()
 
-        return if (tvType == TvType.TvSeries) {
-
+        return if (isSeries) {
             val episodes = doc.select("ul.episodios li").map {
                 val link = it.selectFirst("a")?.attr("href") ?: ""
                 val name = it.selectFirst(".episodiotitle")?.text()
-                val img = extractPoster(it)
-
-                newEpisode(link) {
-                    this.name = name
-                    this.posterUrl = img
-                }
+                newEpisode(link) { this.name = name }
             }
 
             newTvSeriesLoadResponse(title, url, TvType.TvSeries, episodes) {
@@ -191,9 +171,7 @@ class Midasxxi : MainAPI() {
                 this.plot = plot
                 this.tags = tags
             }
-
         } else {
-
             newMovieLoadResponse(title, url, TvType.Movie, url) {
                 posterUrl = poster
                 this.plot = plot
