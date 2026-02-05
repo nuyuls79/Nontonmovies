@@ -52,13 +52,14 @@ class Midasxxi : MainAPI() {
     }
 
     private fun extractPoster(el: Element): String? {
-        val img = el.selectFirst("img")?.attr("data-src")
-            ?.ifBlank { el.selectFirst("img")?.attr("src") }
-        if (!img.isNullOrEmpty()) return img.fixUrl()
-        val bg = el.attr("style")
-        val regex = Regex("url\\(['\"]?(.*?)['\"]?\\)")
-        val match = regex.find(bg)?.groupValues?.get(1)
-        return match?.fixUrl()
+        val imgEl = el.selectFirst("img") ?: return null
+        val url =
+            imgEl.attr("data-src").ifBlank {
+                imgEl.attr("data-lazy-src").ifBlank {
+                    imgEl.attr("src")
+                }
+            }
+        return if (url.isNotBlank()) url.fixUrl() else null
     }
 
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
