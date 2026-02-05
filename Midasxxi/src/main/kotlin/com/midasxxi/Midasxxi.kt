@@ -52,7 +52,8 @@ class Midasxxi : MainAPI() {
     }
 
     private fun extractPoster(el: Element): String? {
-        val img = el.selectFirst("img")?.attr("data-src")?.ifBlank { el.selectFirst("img")?.attr("src") }
+        val img = el.selectFirst("img")?.attr("data-src")
+            ?.ifBlank { el.selectFirst("img")?.attr("src") }
         if (!img.isNullOrEmpty()) return img.fixUrl()
         val bg = el.attr("style")
         val regex = Regex("url\\(['\"]?(.*?)['\"]?\\)")
@@ -78,7 +79,7 @@ class Midasxxi : MainAPI() {
         mainUrl = getBaseUrl(res.url)
 
         val items = res.document
-            .select("article.item")
+            .select("div.items article.item, div.list_genres article.item")
             .mapNotNull { it.toSearchResult(request.name) }
 
         return newHomePageResponse(request.name, items)
@@ -108,7 +109,7 @@ class Midasxxi : MainAPI() {
         mainUrl = getBaseUrl(res.url)
 
         val items = res.document
-            .select("article.item")
+            .select("div.items article.item, div.list_genres article.item")
             .mapNotNull { it.toSearchResult("Search") }
 
         return newSearchResponseList(items)
