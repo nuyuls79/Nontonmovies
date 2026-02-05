@@ -29,7 +29,9 @@ class Midasxxi : MainAPI() {
         "$mainUrl/page/" to "Latest Update",
         "$mainUrl/tvshows/page/" to "TV Series",
         "$mainUrl/genre/action/page/" to "Action",
+        "$mainUrl/genre/anime/page/" to "Anime",
         "$mainUrl/genre/comedy/page/" to "Comedy",
+        "$mainUrl/genre/crime/page/" to "Crime",
         "$mainUrl/genre/drama/page/" to "Drama",
         "$mainUrl/genre/fantasy/page/" to "Fantasy",
         "$mainUrl/genre/horror/page/" to "Horror",
@@ -49,64 +51,74 @@ class Midasxxi : MainAPI() {
         return mainUrl + this
     }
 
-    private fun extractPoster(el: Element): String? =
-        el.selectFirst("img")?.attr("data-src")?.ifBlank { el.selectFirst("img")?.attr("src") }?.fixUrl()
+    private fun extractPoster(el: Element): String? {
+        val img = el.selectFirst("img")?.attr("data-src")?.ifBlank { el.selectFirst("img")?.attr("src") }
+        if (!img.isNullOrEmpty()) return img.fixUrl()
+        val bg = el.attr("style")
+        val regex = Regex("url\\(['\"]?(.*?)['\"]?\\)")
+        val match = regex.find(bg)?.groupValues?.get(1)
+        return match?.fixUrl()
+    }
 
-    private fun extractQuality(el: Element): SearchQuality? {
-        val q = el.selectFirst("span.quality")?.text()?.uppercase() ?: return null
-        return when {
-            q.contains("HD") -> SearchQuality.HD
-            else -> SearchQuality.SD
+    private fun extractQuality(el: Element, category: String): SearchQuality? {
+        return when (category) {
+            "Latest Update", "Action" -> SearchQuality.HD
+            "TV Series" -> {
+                val q = el.selectFirst("span.quality")?.text()?.uppercase()
+                if (q?.contains("HD") == true) SearchQuality.HD else SearchQuality.SD
+            }
+            "Comedy" -> SearchQuality.SD
+            else -> null
         }
     }
 
-    private fun extractRating(el: Element): Double? {
-        val r = el.selectFirst("span.rating")?.text()?.trim()
-        return r?.toDoubleOrNull()
-    }
-
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
-        val res = if (page == 1) app.get(request.data) else app.get("${request.data}$page/")
+        val url = if (page == 1) request.data else "${request.data}$page/"
+        val res = app.get(url)
         mainUrl = getBaseUrl(res.url)
-        val items = res.document.select("article.item").mapNotNull { it.toSearchResult() }
+
+        val items = res.document
+            .select("article.item")
+            .mapNotNull { it.toSearchResult(request.name) }
+
         return newHomePageResponse(request.name, items)
     }
 
-    private fun Element.toSearchResult(): SearchResponse? {
-        val title = selectFirst("div.data h3 a")?.text() ?: selectFirst("img")?.attr("alt") ?: return null
+    private fun Element.toSearchResult(category: String): SearchResponse? {
+        val title = selectFirst("div.data h3 a")?.text()
+            ?: selectFirst("img")?.attr("alt")
+            ?: return null
+
         val href = selectFirst("a")?.attr("href")?.fixUrl() ?: return null
         val poster = extractPoster(this)
-        val quality = extractQuality(this)
-        val rating = extractRating(this)
+        val quality = extractQuality(this, category)
 
-        val type = if (href.contains("/tvshows/")) TvType.TvSeries else TvType.Movie
+        val type =
+            if (href.contains("/tvshows/")) TvType.TvSeries
+            else TvType.Movie
 
-        return if (type == TvType.TvSeries) {
-            newAnimeSearchResponse(title.trim(), href, TvType.TvSeries) {
-                posterUrl = poster
-                this.score = Score.from10(rating)
-            }
-        } else {
-            newMovieSearchResponse(title.trim(), href, TvType.Movie) {
-                posterUrl = poster
-                this.quality = quality
-                this.score = Score.from10(rating)
-            }
+        return newMovieSearchResponse(title.trim(), href, type) {
+            this.posterUrl = poster
+            this.quality = quality
         }
     }
 
     override suspend fun search(query: String, page: Int): SearchResponseList {
         val res = app.get("$mainUrl/search/$query/page/$page")
         mainUrl = getBaseUrl(res.url)
-        val items = res.document.select("article.item").mapNotNull { it.toSearchResult() }
+
+        val items = res.document
+            .select("article.item")
+            .mapNotNull { it.toSearchResult("Search") }
+
         return newSearchResponseList(items)
     }
 
     override suspend fun load(url: String): LoadResponse {
         val res = app.get(url)
         directUrl = getBaseUrl(res.url)
-        val doc = res.document
 
+        val doc = res.document
         val title = doc.selectFirst("h1")?.text()?.trim() ?: "Unknown"
         val poster = extractPoster(doc)
         val plot = doc.selectFirst("div.wp-content p")?.text()
@@ -114,7 +126,7 @@ class Midasxxi : MainAPI() {
         val isSeries = doc.select("ul.episodios").isNotEmpty()
 
         return if (isSeries) {
-            val episodes = doc.select("ul.episodios li").mapNotNull {
+            val episodes = doc.select("ul.episodios li").map {
                 val link = it.selectFirst("a")?.attr("href") ?: ""
                 val name = it.selectFirst(".episodiotitle")?.text()
                 newEpisode(link) { this.name = name }
@@ -155,8 +167,13 @@ class Midasxxi : MainAPI() {
 
             val aes = AppUtils.parseJson<AesData>(json.embed_url)
             val key = generateKey(json.key, aes.m)
-            val decrypted = AesHelper.cryptoAESHandler(json.embed_url, key.toByteArray(), false)
-                ?.replace("\"", "")?.replace("\\", "") ?: return@amap
+
+            val decrypted = AesHelper.cryptoAESHandler(
+                json.embed_url,
+                key.toByteArray(),
+                false
+            )?.replace("\"", "")?.replace("\\", "")
+                ?: return@amap
 
             loadExtractor(decrypted, directUrl, subtitleCallback, callback)
         }
@@ -167,7 +184,9 @@ class Midasxxi : MainAPI() {
         val rList = r.split("\\x")
         val decoded = base64Decode(m.reversed())
         var n = ""
-        for (s in decoded.split("|")) n += "\\x" + rList[s.toInt() + 1]
+        for (s in decoded.split("|")) {
+            n += "\\x" + rList[s.toInt() + 1]
+        }
         return n
     }
 
