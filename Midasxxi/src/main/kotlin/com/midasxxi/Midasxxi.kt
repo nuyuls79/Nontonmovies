@@ -27,19 +27,19 @@ class Midasxxi : MainAPI() {
 
     override val mainPage = mainPageOf(
         mainUrl to "Latest Update",
-        mainUrl to "TV Series",
-        mainUrl to "Action",
-        mainUrl to "Anime",
-        mainUrl to "Comedy",
-        mainUrl to "Crime",
-        mainUrl to "Drama",
-        mainUrl to "Fantasy",
-        mainUrl to "Horror",
-        mainUrl to "Mystery",
-        mainUrl to "China",
-        mainUrl to "Japan",
-        mainUrl to "Philippines",
-        mainUrl to "Thailand"
+        "$mainUrl/tvshows/" to "TV Series",
+        "$mainUrl/genre/action/" to "Action",
+        "$mainUrl/genre/anime/" to "Anime",
+        "$mainUrl/genre/comedy/" to "Comedy",
+        "$mainUrl/genre/crime/" to "Crime",
+        "$mainUrl/genre/drama/" to "Drama",
+        "$mainUrl/genre/fantasy/" to "Fantasy",
+        "$mainUrl/genre/horror/" to "Horror",
+        "$mainUrl/genre/mystery/" to "Mystery",
+        "$mainUrl/tag/china/" to "China",
+        "$mainUrl/tag/japan/" to "Japan",
+        "$mainUrl/tag/philippines/" to "Philippines",
+        "$mainUrl/tag/thailand/" to "Thailand"
     )
 
     private fun getBaseUrl(url: String): String =
@@ -62,31 +62,18 @@ class Midasxxi : MainAPI() {
     }
 
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
-        val res = app.get(mainUrl)
+        val url = if (page == 1) request.data else "${request.data}page/$page/"
+        val res = app.get(url)
         mainUrl = getBaseUrl(res.url)
 
-        val items = when (request.name) {
-            "Latest Update" -> res.document.select("#dt-latest article.item")
-            "TV Series" -> res.document.select("#dt-tvshows article.item")
-            "Action" -> res.document.select("#dt-action article.item")
-            "Anime" -> res.document.select("#genre_anime article.item")
-            "Comedy" -> res.document.select("#dt-comedy article.item")
-            "Crime" -> res.document.select("#dt-crime article.item")
-            "Drama" -> res.document.select("#dt-drama article.item")
-            "Fantasy" -> res.document.select("#dt-fantasy article.item")
-            "Horror" -> res.document.select("#dt-horror article.item")
-            "Mystery" -> res.document.select("#dt-mystery article.item")
-            "China" -> res.document.select("#country_china article.item")
-            "Japan" -> res.document.select("#country_japan article.item")
-            "Philippines" -> res.document.select("#country_philippines article.item")
-            "Thailand" -> res.document.select("#country_thailand article.item")
-            else -> res.document.select("#dt-latest article.item")
-        }.mapNotNull { it.toSearchResult(request.name) }
+        val items = res.document
+            .select("article.item")
+            .mapNotNull { it.toSearchResult() }
 
         return newHomePageResponse(request.name, items)
     }
 
-    private fun Element.toSearchResult(category: String): SearchResponse? {
+    private fun Element.toSearchResult(): SearchResponse? {
         val title = selectFirst("div.data h3 a")?.text()
             ?: selectFirst("img")?.attr("alt")
             ?: return null
@@ -104,12 +91,12 @@ class Midasxxi : MainAPI() {
     }
 
     override suspend fun search(query: String, page: Int): SearchResponseList {
-        val res = app.get("$mainUrl/search/$query/page/$page")
+        val res = app.get("$mainUrl/?s=$query")
         mainUrl = getBaseUrl(res.url)
 
         val items = res.document
-            .select("div.items article.item, div.list_genres article.item")
-            .mapNotNull { it.toSearchResult("Search") }
+            .select("article.item")
+            .mapNotNull { it.toSearchResult() }
 
         return newSearchResponseList(items)
     }
