@@ -12,9 +12,9 @@ buildscript {
     }
 
     dependencies {
-        classpath("com.android.tools.build:gradle:8.13.2")
-        classpath("com.github.recloudstream:gradle:1.0.2") // versi stabil
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.3.0")
+        classpath("com.android.tools.build:gradle:8.13.2") // Versi AGP terbaru
+        classpath("com.github.recloudstream:gradle:cce1b8d84d") // SHA commit stabil
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.3.0") // Cocok Cloudstream pre-release
     }
 }
 
@@ -38,10 +38,8 @@ subprojects {
     apply(plugin = "com.lagradost.cloudstream3.gradle")
 
     cloudstream {
-        setRepo(
-            System.getenv("GITHUB_REPOSITORY")
-                ?: "https://github.com/phisher98/cloudstream-extensions-phisher"
-        )
+        setRepo(System.getenv("GITHUB_REPOSITORY") ?: 
+            "https://github.com/phisher98/cloudstream-extensions-phisher")
         authors = listOf("Phisher98")
     }
 
@@ -50,8 +48,8 @@ subprojects {
 
         defaultConfig {
             minSdk = 21
-            compileSdkVersion(35)
             targetSdk = 35
+            compileSdkVersion(35)
         }
 
         compileOptions {
@@ -66,7 +64,7 @@ subprojects {
                     "-Xno-call-assertions",
                     "-Xno-param-assertions",
                     "-Xno-receiver-assertions",
-                    "-Xskip-metadata-version-check"
+                    "-Xskip-metadata-version-check" // Supaya R8 gak error metadata
                 )
             }
         }
