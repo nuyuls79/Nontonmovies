@@ -7,7 +7,7 @@ import org.jsoup.Jsoup
 
 class Animexin : MainAPI() {
     override var mainUrl              = "https://animexin.dev"
-    override var name                 = "Animexin🧩"
+    override var name                 = "Animexin🐢"
     override val hasMainPage          = true
     override var lang                 = "id"
     override val hasDownloadSupport   = true
