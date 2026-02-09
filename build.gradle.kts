@@ -13,7 +13,7 @@ buildscript {
     dependencies {
         classpath("com.android.tools.build:gradle:8.7.3")
         classpath("com.github.recloudstream:gradle:master-SNAPSHOT")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.0") // ✅ versi stabil
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.0") // ✅ stabil
     }
 }
 
@@ -49,9 +49,10 @@ subprojects {
     android {
         namespace = "com.excloud"
 
+        compileSdk = 35
+
         defaultConfig {
             minSdk = 21
-            compileSdkVersion(35)
             targetSdk = 35
         }
 
@@ -60,13 +61,13 @@ subprojects {
             targetCompatibility = JavaVersion.VERSION_1_8
         }
 
-        // ✅ Disable R8 / minify untuk mencegah crash metadata Kotlin
+        // ✅ Build types fix untuk Kotlin DSL
         buildTypes {
-            debug {
+            getByName("debug") {
                 isMinifyEnabled = false
                 isShrinkResources = false
             }
-            release {
+            getByName("release") {
                 isMinifyEnabled = false
                 isShrinkResources = false
             }
