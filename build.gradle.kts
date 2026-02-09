@@ -13,7 +13,7 @@ buildscript {
     dependencies {
         classpath("com.android.tools.build:gradle:8.7.3")
         classpath("com.github.recloudstream:gradle:master-SNAPSHOT")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.3.0") // <-- Cocok sama cloudstream pre-release
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.3.0")
     }
 }
 
@@ -25,13 +25,11 @@ allprojects {
     }
 }
 
-fun Project.cloudstream(
-    configuration: CloudstreamExtension.() -> Unit
-) = extensions.getByName<CloudstreamExtension>("cloudstream").configuration()
+fun Project.cloudstream(configuration: CloudstreamExtension.() -> Unit) =
+    extensions.getByName<CloudstreamExtension>("cloudstream").configuration()
 
-fun Project.android(
-    configuration: BaseExtension.() -> Unit
-) = extensions.getByName<BaseExtension>("android").configuration()
+fun Project.android(configuration: BaseExtension.() -> Unit) =
+    extensions.getByName<BaseExtension>("android").configuration()
 
 subprojects {
     apply(plugin = "com.android.library")
@@ -52,7 +50,7 @@ subprojects {
         defaultConfig {
             minSdk = 21
             targetSdk = 35
-            compileSdkVersion(35) // Gunakan compileSdkVersion untuk kompatibilitas AGP 8.7
+            compileSdkVersion(35) // AGP 8.7 compatible
         }
 
         compileOptions {
@@ -68,7 +66,7 @@ subprojects {
                 "-Xno-call-assertions",
                 "-Xno-param-assertions",
                 "-Xno-receiver-assertions",
-                "-Xskip-metadata-version-check" // <-- Supaya R8 gak error metadata
+                "-Xskip-metadata-version-check" // Fix R8 Kotlin metadata error
             )
         }
     }
@@ -77,7 +75,6 @@ subprojects {
         val cloudstream by configurations
         val implementation by configurations
 
-        // Pakai versi pre-release sesuai Kotlin 2.3.0
         cloudstream("com.lagradost:cloudstream3:pre-release")
 
         implementation(kotlin("stdlib", "2.3.0"))
