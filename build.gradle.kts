@@ -1,4 +1,4 @@
-import com.android.build.gradle.BaseExtension
+import com.android.build.gradle.LibraryExtension
 import com.lagradost.cloudstream3.gradle.CloudstreamExtension
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
@@ -13,7 +13,7 @@ buildscript {
     dependencies {
         classpath("com.android.tools.build:gradle:8.7.3")
         classpath("com.github.recloudstream:gradle:master-SNAPSHOT")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.0") // ✅ stabil
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.0")
     }
 }
 
@@ -25,13 +25,15 @@ allprojects {
     }
 }
 
+// ✅ Kotlin DSL CloudStream extension
 fun Project.cloudstream(
     configuration: CloudstreamExtension.() -> Unit
 ) = extensions.getByName<CloudstreamExtension>("cloudstream").configuration()
 
+// ✅ Kotlin DSL Android extension untuk Library module
 fun Project.android(
-    configuration: BaseExtension.() -> Unit
-) = extensions.getByName<BaseExtension>("android").configuration()
+    configuration: LibraryExtension.() -> Unit
+) = extensions.getByName<LibraryExtension>("android").configuration()
 
 subprojects {
     apply(plugin = "com.android.library")
@@ -48,7 +50,6 @@ subprojects {
 
     android {
         namespace = "com.excloud"
-
         compileSdk = 35
 
         defaultConfig {
@@ -61,7 +62,6 @@ subprojects {
             targetCompatibility = JavaVersion.VERSION_1_8
         }
 
-        // ✅ Build types fix untuk Kotlin DSL
         buildTypes {
             getByName("debug") {
                 isMinifyEnabled = false
@@ -74,7 +74,7 @@ subprojects {
         }
     }
 
-    // ✅ Set Kotlin JVM target & free compiler args
+    // ✅ Kotlin compile options
     tasks.withType<KotlinJvmCompile> {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_1_8)
