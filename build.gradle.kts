@@ -13,7 +13,7 @@ buildscript {
     dependencies {
         classpath("com.android.tools.build:gradle:8.7.3")
         classpath("com.github.recloudstream:gradle:master-SNAPSHOT")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.3.0")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.0") // ✅ versi stabil
     }
 }
 
@@ -59,9 +59,21 @@ subprojects {
             sourceCompatibility = JavaVersion.VERSION_1_8
             targetCompatibility = JavaVersion.VERSION_1_8
         }
+
+        // ✅ Disable R8 / minify untuk mencegah crash metadata Kotlin
+        buildTypes {
+            debug {
+                isMinifyEnabled = false
+                isShrinkResources = false
+            }
+            release {
+                isMinifyEnabled = false
+                isShrinkResources = false
+            }
+        }
     }
 
-    // ✅ POSISI YANG BENAR
+    // ✅ Set Kotlin JVM target & free compiler args
     tasks.withType<KotlinJvmCompile> {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_1_8)
