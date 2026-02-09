@@ -13,7 +13,7 @@ buildscript {
     dependencies {
         classpath("com.android.tools.build:gradle:8.7.3")
         classpath("com.github.recloudstream:gradle:master-SNAPSHOT")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.3.0") // Upgrade ke 2.3.0
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.3.0")
     }
 }
 
@@ -51,7 +51,7 @@ subprojects {
 
         defaultConfig {
             minSdk = 21
-            compileSdk = 35  // pakai compileSdk property baru
+            compileSdkVersion(35)
             targetSdk = 35
         }
 
@@ -61,12 +61,11 @@ subprojects {
         }
     }
 
-    // Kotlin compiler settings
+    // ✅ POSISI YANG BENAR
     tasks.withType<KotlinJvmCompile> {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_1_8)
             freeCompilerArgs.addAll(
-                "-Xskip-metadata-version-check", // ❗ Supaya bisa baca library Kotlin 2.3
                 "-Xno-call-assertions",
                 "-Xno-param-assertions",
                 "-Xno-receiver-assertions"
@@ -80,8 +79,7 @@ subprojects {
 
         cloudstream("com.lagradost:cloudstream3:pre-release")
 
-        implementation(kotlin("stdlib", "2.3.0")) // sesuaikan dengan plugin Kotlin
-
+        implementation(kotlin("stdlib"))
         implementation("com.github.Blatzar:NiceHttp:0.4.13")
         implementation("org.jsoup:jsoup:1.18.3")
         implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.16.0")
