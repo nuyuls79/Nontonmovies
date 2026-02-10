@@ -33,7 +33,7 @@ open class Donghuastream : MainAPI() {
     override var mainUrl              = "https://donghuastream.org"
     override var name                 = "Donghuastream🀄"
     override val hasMainPage          = true
-    override var lang                 = "id"
+    override var lang                 = "zh"
     override val hasDownloadSupport   = true
     override val supportedTypes       = setOf(TvType.Anime)
 
