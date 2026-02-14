@@ -48,7 +48,7 @@ import kotlin.math.max
 
 class MovieBoxProvider : MainAPI() {
     override var mainUrl = "https://api3.aoneroom.com"
-    override var name = "Moviebox🥑"
+    override var name = "Moviebox📦"
     override val hasMainPage = true
     override var lang = "id"
     override val supportedTypes = setOf(TvType.Movie, TvType.TvSeries)
@@ -132,21 +132,23 @@ class MovieBoxProvider : MainAPI() {
     }
 
     override val mainPage = mainPageOf(
-        "4516404531735022304" to "Trending",
-        "5692654647815587592" to "Trending in Cinema",
-        "414907768299210008"  to "Bollywood",
-        "3859721901924910512" to "South Indian",
-        "8019599703232971616" to "Hollywood",
-        "4741626294545400336" to "Top Series This Week",
-        "8434602210994128512" to "Anime",
-        "1255898847918934600" to "Reality TV",
-        "4903182713986896328" to "Indian Drama",
-        "7878715743607948784" to "Korean Drama",
-        "8788126208987989488" to "Chinese Drama",
-        "3910636007619709856" to "Western TV",
-        "5177200225164885656" to "Turkish Drama",
+       "4516404531735022304" to "Trending",
+        //"5692654647815587592" to "Trending in Cinema",
+        //"414907768299210008"  to "Bollywood",
+        //"3859721901924910512" to "South Indian",
+        //"8019599703232971616" to "Hollywood",
+        //"4741626294545400336" to "Top Series This Week",
+        //"8434602210994128512" to "Anime",
+        //"1255898847918934600" to "Reality TV",
+        //"4903182713986896328" to "Indian Drama",
+        //"7878715743607948784" to "Korean Drama",
+        //"8788126208987989488" to "Chinese Drama",
+        //"3910636007619709856" to "Western TV",
+        //"5177200225164885656" to "Turkish Drama",
         "1|1" to "Movies",
         "1|2" to "Series",
+        "1|1;country=Indonesia" to "Indonesian (Movies)",
+        "1|2;country=Indonesia" to "Indonesian (Series)",
         "1|1006" to "Anime",
         "1|1;country=India" to "Indian (Movies)",
         "1|2;country=India" to "Indian (Series)",
