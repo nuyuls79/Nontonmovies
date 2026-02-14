@@ -1,0 +1,9 @@
+{
+    "name": "ModSanz",
+    "description": "Cloudstream extensions collection",
+    "iconUrl": "https://ibb.co.com/9mdpbhNh",
+    "manifestVersion": 1,
+    "pluginLists": [
+      "https://raw.githubusercontent.com/GilangAditama/Nontonmovies/builds/plugins.json"
+    ]
+}
