@@ -810,5 +810,25 @@
         "description": "Watch movies and series from Watch32",
         "url": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/Watch32.cs3",
         "name": "Watch32"
+    },
+    {        
+        "iconUrl": "https://nontonfilm.gratis/wp-content/uploads/2024/12/gratis-1.png",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/recloudstream/cloudstream",
+        "fileSize": 26685,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "CodeSannz"
+        ],
+        "tvTypes": [
+            "AsianDrama",
+            "TvSeries",
+            "Movie"
+        ],
+        "version": 1,
+        "internalName": "Nontonfilm",
+        "url": "https://raw.githubusercontent.com/AnitacanFafexetXzgsfe4-DckHlm/GsgeuFc/main/Nontonfilm.cs3",
+        "name": "Nontonfilm"
     }
 ]
