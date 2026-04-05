@@ -1,0 +1,865 @@
+[
+    {
+        "iconUrl": "https://animekhor.org/wp-content/uploads/2021/11/AnimeKhor_darkmode.png",
+        "jarFileSize": 84541,
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/nuyuls79/Nontonmovies",
+        "fileSize": 21275,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Phisher98"
+        ],
+        "tvTypes": [
+            "AnimeMovie",
+            "Anime"
+        ],
+        "version": 8,
+        "internalName": "Animekhor",
+        "jarUrl": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/Animekhor.jar",
+        "description": "Anime and Movies",
+        "url": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/Animekhor.cs3",
+        "name": "Animekhor"
+    },
+    {
+        "iconUrl": "https://icons.duckduckgo.com/ip3/ww3.anoboy.app.ico",
+        "jarFileSize": 103653,
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/nuyuls79/Nontonmovies",
+        "fileSize": 27117,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Hexated"
+        ],
+        "tvTypes": [
+            "AnimeMovie",
+            "Anime",
+            "OVA"
+        ],
+        "version": 5,
+        "internalName": "Anoboy",
+        "jarUrl": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/Anoboy.jar",
+        "url": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/Anoboy.cs3",
+        "name": "Anoboy"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=auratail.vip&sz=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/nuyuls79/Nontonmovies",
+        "fileSize": 16977,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Zephyra77"
+        ],
+        "tvTypes": [
+            "AnimeMovie",
+            "Anime"
+        ],
+        "version": 14,
+        "internalName": "Auratail",
+        "description": "Streaming anime dan donghua dari Auratail",
+        "url": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/Auratail.cs3",
+        "name": "Auratail"
+    },
+    {
+        "iconUrl": "https://i.postimg.cc/TYKyC16H/images.png",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/nuyuls79/Nontonmovies",
+        "fileSize": 33754,
+        "status": 1,
+        "language": "en",
+        "authors": [
+            "horis"
+        ],
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "version": 42,
+        "internalName": "Disney Plus",
+        "description": "Disney+ Multiple Languages",
+        "url": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/Disney Plus.cs3",
+        "name": "Disney Plus"
+    },
+    {
+        "iconUrl": "https://raw.githubusercontent.com/Kohi-den/extensions-source/927f9c68fd64ce52f6212ae633d0f0585eca3545/src/en/donghuastream/res/mipmap-xxxhdpi/ic_launcher.png",
+        "jarFileSize": 187895,
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/nuyuls79/Nontonmovies",
+        "fileSize": 37444,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Phisher98"
+        ],
+        "tvTypes": [
+            "Anime"
+        ],
+        "version": 15,
+        "internalName": "Donghuastream",
+        "jarUrl": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/Donghuastream.jar",
+        "description": "Contains SeaTV (Chinese)",
+        "url": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/Donghuastream.cs3",
+        "name": "Donghuastream"
+    },
+    {
+        "iconUrl": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://donghub.vip&size=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/nuyuls79/Nontonmovies",
+        "fileSize": 21953,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "duro92",
+            "CodeSannz"
+        ],
+        "tvTypes": [
+            "AnimeMovie",
+            "Anime",
+            "Cartoon"
+        ],
+        "version": 6,
+        "internalName": "Donghub",
+        "description": "Anime and Movies",
+        "url": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/Donghub.cs3",
+        "name": "Donghub"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=dramafull.cc&sz=%size%",
+        "jarFileSize": 69849,
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/nuyuls79/Nontonmovies",
+        "fileSize": 21142,
+        "status": 1,
+        "language": "en",
+        "authors": [
+            "Phisher98"
+        ],
+        "tvTypes": [
+            "AsianDrama",
+            "TvSeries",
+            "Movie"
+        ],
+        "version": 1,
+        "internalName": "DramaFull",
+        "jarUrl": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/DramaFull.jar",
+        "description": "Kdramas and Movies",
+        "url": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/DramaFull.cs3",
+        "name": "DramaFull"
+    },
+    {
+        "iconUrl": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://justilien.com&size=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/nuyuls79/Nontonmovies",
+        "fileSize": 35579,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Duro92"
+        ],
+        "tvTypes": [
+            "AsianDrama",
+            "TvSeries",
+            "Movie"
+        ],
+        "version": 16,
+        "internalName": "Dutamovie",
+        "description": "DutaMovie",
+        "url": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/Dutamovie.cs3",
+        "name": "Dutamovie"
+    },
+    {
+        "iconUrl": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://filmapik.singles&size=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/nuyuls79/Nontonmovies",
+        "fileSize": 21688,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Duro92",
+            "CodeSanzz"
+        ],
+        "tvTypes": [
+            "AsianDrama",
+            "TvSeries",
+            "Movie"
+        ],
+        "version": 2,
+        "internalName": "FilmApik",
+        "description": "Filmapik",
+        "url": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/FilmApik.cs3",
+        "name": "FilmApik"
+    },
+    {
+        "iconUrl": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://fufafilm.com&size=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/nuyuls79/Nontonmovies",
+        "fileSize": 28846,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Duro92"
+        ],
+        "tvTypes": [
+            "AsianDrama",
+            "TvSeries",
+            "Movie"
+        ],
+        "version": 3,
+        "internalName": "Fufafilm",
+        "description": "Fufafilm",
+        "url": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/Fufafilm.cs3",
+        "name": "Fufafilm"
+    },
+    {
+        "iconUrl": "https://raw.githubusercontent.com/phisher98/TVVVV/refs/heads/main/Icons/Funmovieslix.png",
+        "jarFileSize": 76224,
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/nuyuls79/Nontonmovies",
+        "fileSize": 21117,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Phisher98"
+        ],
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "version": 4,
+        "internalName": "Funmovieslix",
+        "jarUrl": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/Funmovieslix.jar",
+        "description": "Indonesia Source",
+        "url": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/Funmovieslix.cs3",
+        "name": "Funmovieslix"
+    },
+    {
+        "iconUrl": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://v2.hidoristream.online&size=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/nuyuls79/Nontonmovies",
+        "fileSize": 33379,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Duro92"
+        ],
+        "tvTypes": [
+            "AsianDrama",
+            "TvSeries",
+            "Movie"
+        ],
+        "version": 1,
+        "internalName": "Hidoristream",
+        "description": "Hidoristream",
+        "url": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/Hidoristream.cs3",
+        "name": "Hidoristream"
+    },
+    {
+        "iconUrl": "https://t0.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://idlixian.com&size=16",
+        "jarFileSize": 113266,
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/nuyuls79/Nontonmovies",
+        "fileSize": 29743,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Hexated,Phisher98"
+        ],
+        "tvTypes": [
+            "TvSeries",
+            "Movie",
+            "Anime",
+            "AsianDrama"
+        ],
+        "version": 6,
+        "internalName": "IdlixProvider",
+        "jarUrl": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/IdlixProvider.jar",
+        "url": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/IdlixProvider.cs3",
+        "name": "IdlixProvider"
+    },
+    {
+        "iconUrl": "https://homecookingrocks.com/wp-content/uploads/2024/10/cropped-indomax21-favicon-color-1.png",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/nuyuls79/Nontonmovies",
+        "fileSize": 26303,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Miku"
+        ],
+        "tvTypes": [
+            "NSFW"
+        ],
+        "version": 3,
+        "internalName": "IndoMax21Provider",
+        "description": "IndoMax21 \u2014 Streaming Anime, Donghua, Hentai, Porn, Movie and TV Series",
+        "url": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/IndoMax21Provider.cs3",
+        "name": "IndoMax21Provider"
+    },
+    {
+        "iconUrl": "https://missav.ws/missav/logo-square.png",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/nuyuls79/Nontonmovies",
+        "fileSize": 22212,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Miku"
+        ],
+        "tvTypes": [
+            "NSFW"
+        ],
+        "version": 2,
+        "internalName": "JavHeyProvider",
+        "description": "JavHey \u2014 Streaming Porn and JAV",
+        "url": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/JavHeyProvider.cs3",
+        "name": "JavHeyProvider"
+    },
+    {
+        "iconUrl": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://tv2.kawanfilm21.co&size=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/nuyuls79/Nontonmovies",
+        "fileSize": 27650,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Duro92"
+        ],
+        "tvTypes": [
+            "AsianDrama",
+            "TvSeries",
+            "Movie"
+        ],
+        "version": 5,
+        "internalName": "Kawanfilm",
+        "description": "Kawanfilm",
+        "url": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/Kawanfilm.cs3",
+        "name": "Kawanfilm"
+    },
+    {
+        "iconUrl": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://kissasian.cam&size=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/nuyuls79/Nontonmovies",
+        "fileSize": 32734,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Duro92"
+        ],
+        "tvTypes": [
+            "AsianDrama",
+            "TvSeries",
+            "Movie"
+        ],
+        "version": 4,
+        "internalName": "Kissasian",
+        "description": "Kissasian",
+        "url": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/Kissasian.cs3",
+        "name": "Kissasian"
+    },
+    {
+        "iconUrl": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://kisskh.ovh&size=%size%",
+        "jarFileSize": 116251,
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/nuyuls79/Nontonmovies",
+        "fileSize": 27843,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Duro92"
+        ],
+        "tvTypes": [
+            "AsianDrama",
+            "TvSeries",
+            "Anime",
+            "Movie"
+        ],
+        "version": 16,
+        "internalName": "KisskhProvider",
+        "jarUrl": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/KisskhProvider.jar",
+        "url": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/KisskhProvider.cs3",
+        "name": "KisskhProvider"
+    },
+    {
+        "iconUrl": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://klikxxi.fit&size=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/nuyuls79/Nontonmovies",
+        "fileSize": 23981,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Duro92"
+        ],
+        "tvTypes": [
+            "TvSeries",
+            "Movie"
+        ],
+        "version": 9,
+        "internalName": "Klikxxi",
+        "description": "Klikxxi",
+        "url": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/Klikxxi.cs3",
+        "name": "Klikxxi"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=45.12.2.2&sz=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/nuyuls79/Nontonmovies",
+        "fileSize": 26249,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Hexated"
+        ],
+        "tvTypes": [
+            "AnimeMovie",
+            "Anime",
+            "OVA"
+        ],
+        "version": 21,
+        "internalName": "KuronimeProvider",
+        "url": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/KuronimeProvider.cs3",
+        "name": "KuronimeProvider"
+    },
+    {
+        "iconUrl": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://layarasia.site&size=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/nuyuls79/Nontonmovies",
+        "fileSize": 32159,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Miku"
+        ],
+        "tvTypes": [
+            "AsianDrama",
+            "TvSeries",
+            "Movie"
+        ],
+        "version": 1,
+        "internalName": "LayarAsiaProvider",
+        "description": "LayarAsia \u2014 Streaming Drama Korean, Movie and TV Series",
+        "url": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/LayarAsiaProvider.cs3",
+        "name": "LayarAsiaProvider"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=tv7.lk21.am.in&sz=%size%",
+        "jarFileSize": 96466,
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/nuyuls79/Nontonmovies",
+        "fileSize": 25936,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Hexated,Phisher98"
+        ],
+        "tvTypes": [
+            "AsianDrama",
+            "TvSeries",
+            "Movie"
+        ],
+        "version": 10,
+        "internalName": "LayarKacaProvider",
+        "jarUrl": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/LayarKacaProvider.jar",
+        "url": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/LayarKacaProvider.cs3",
+        "name": "LayarKacaProvider"
+    },
+    {
+        "iconUrl": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://tv11.melongmovies.com&size=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/nuyuls79/Nontonmovies",
+        "fileSize": 25159,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Duro92"
+        ],
+        "tvTypes": [
+            "AsianDrama",
+            "TvSeries",
+            "Movie"
+        ],
+        "version": 8,
+        "internalName": "Melongmovie",
+        "description": "Melongmovie",
+        "url": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/Melongmovie.cs3",
+        "name": "Melongmovie"
+    },
+    {
+        "iconUrl": "https://github.com/NivinCNC/CNCVerse-Cloud-Stream-Extension/raw/refs/heads/master/MovieBoxProvider/icon.png",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/nuyuls79/Nontonmovies",
+        "fileSize": 55418,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "NivinCNC,Phisher98"
+        ],
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "version": 9,
+        "internalName": "MovieBoxProvider",
+        "description": "Multi Language Movies and Series Provider",
+        "url": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/MovieBoxProvider.cs3",
+        "name": "MovieBoxProvider"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=nekopoi.care&sz=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/nuyuls79/Nontonmovies",
+        "fileSize": 40124,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Miku"
+        ],
+        "tvTypes": [
+            "NSFW"
+        ],
+        "version": 2,
+        "internalName": "NekopoiProvider",
+        "description": "NekoPoi \u2014 Streaming Hentai, Porn and JAV Subtitle Indonesia",
+        "url": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/NekopoiProvider.cs3",
+        "name": "NekopoiProvider"
+    },
+    {
+        "iconUrl": "https://github.com/SaurabhKaperwan/CSX/raw/refs/heads/master/NetflixMirrorProvider/icon.png",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/nuyuls79/Nontonmovies",
+        "fileSize": 53949,
+        "status": 1,
+        "authors": [
+            "megix"
+        ],
+        "tvTypes": [
+            "Movie",
+            "TvSeries",
+            "AsianDrama",
+            "Anime"
+        ],
+        "version": 44,
+        "internalName": "NetflixMirrorProvider",
+        "description": "Netflix, PrimeVideo, JioHotstar(Hotstar, Disney, Paramount, HBO, Peacock) Content in Multiple Languages",
+        "url": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/NetflixMirrorProvider.cs3",
+        "name": "NetflixMirrorProvider"
+    },
+    {
+        "iconUrl": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://new18.ngefilm.site&size=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/nuyuls79/Nontonmovies",
+        "fileSize": 26668,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Duro92"
+        ],
+        "tvTypes": [
+            "AsianDrama",
+            "TvSeries",
+            "Movie"
+        ],
+        "version": 9,
+        "internalName": "Ngefilm",
+        "description": "Ngefilm",
+        "url": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/Ngefilm.cs3",
+        "name": "Ngefilm"
+    },
+    {
+        "iconUrl": "https://new31.ngefilm.site/wp-content/uploads/2023/08/cropped-imageedit_8_4481000408-60x60.png",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/nuyuls79/Nontonmovies",
+        "fileSize": 31763,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Miku"
+        ],
+        "tvTypes": [
+            "AsianDrama",
+            "TvSeries",
+            "Movie"
+        ],
+        "version": 1,
+        "internalName": "NgeFilm21Provider",
+        "description": "NgeFilm21 \u2014 Streaming Movie and TV Series",
+        "url": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/NgeFilm21Provider.cs3",
+        "name": "NgeFilm21Provider"
+    },
+    {
+        "iconUrl": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://nomat.site&size=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/nuyuls79/Nontonmovies",
+        "fileSize": 20572,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Duro92"
+        ],
+        "tvTypes": [
+            "AsianDrama",
+            "TvSeries",
+            "Movie"
+        ],
+        "version": 4,
+        "internalName": "Nomat",
+        "description": "Nomat",
+        "url": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/Nomat.cs3",
+        "name": "Nomat"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=onetouchtv.xyz/&sz=%size%",
+        "jarFileSize": 166601,
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/nuyuls79/Nontonmovies",
+        "fileSize": 37514,
+        "status": 1,
+        "language": "en",
+        "authors": [
+            "Phisher98"
+        ],
+        "tvTypes": [
+            "AsianDrama",
+            "TvSeries"
+        ],
+        "version": 1,
+        "internalName": "OneTouchTV",
+        "jarUrl": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/OneTouchTV.jar",
+        "description": "Asian Dramas",
+        "url": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/OneTouchTV.cs3",
+        "name": "OneTouchTV"
+    },
+    {
+        "iconUrl": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://anime.oploverz.ac&size=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/nuyuls79/Nontonmovies",
+        "fileSize": 30070,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Duro92",
+            "CodeSanzz"
+        ],
+        "tvTypes": [
+            "AnimeMovie",
+            "Anime",
+            "OVA"
+        ],
+        "version": 31,
+        "internalName": "OploverzProvider",
+        "url": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/OploverzProvider.cs3",
+        "name": "OploverzProvider"
+    },
+    {
+        "iconUrl": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://45.11.57.243&size=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/nuyuls79/Nontonmovies",
+        "fileSize": 24270,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Duro92"
+        ],
+        "tvTypes": [
+            "AsianDrama",
+            "TvSeries",
+            "Movie"
+        ],
+        "version": 11,
+        "internalName": "Oppadrama",
+        "description": "Oppadrama",
+        "url": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/Oppadrama.cs3",
+        "name": "Oppadrama"
+    },
+    {
+        "iconUrl": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://otakudesu.cloud&size=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/nuyuls79/Nontonmovies",
+        "fileSize": 28114,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Hexated"
+        ],
+        "tvTypes": [
+            "AnimeMovie",
+            "Anime",
+            "OVA"
+        ],
+        "version": 3,
+        "internalName": "OtakudesuProvider",
+        "url": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/OtakudesuProvider.cs3",
+        "name": "OtakudesuProvider"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=https://pahe.ink&sz=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/nuyuls79/Nontonmovies",
+        "fileSize": 12692,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "ExtremeBoy"
+        ],
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "version": 1,
+        "internalName": "Pahe",
+        "url": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/Pahe.cs3",
+        "name": "Pahe"
+    },
+    {
+        "iconUrl": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://ww03.pencurimovie.bond&size=%size%",
+        "jarFileSize": 65600,
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/nuyuls79/Nontonmovies",
+        "fileSize": 18501,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Phisher98"
+        ],
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "version": 8,
+        "internalName": "Pencurimovie",
+        "jarUrl": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/Pencurimovie.jar",
+        "description": "Pencurimovie ",
+        "url": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/Pencurimovie.cs3",
+        "name": "Pencurimovie"
+    },
+    {
+        "iconUrl": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://v1.pusatfilm21info.net&size=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/nuyuls79/Nontonmovies",
+        "fileSize": 21416,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Hexated",
+            "TeKuma25"
+        ],
+        "tvTypes": [
+            "AsianDrama",
+            "TvSeries",
+            "Movie"
+        ],
+        "version": 11,
+        "internalName": "Pusatfilm",
+        "description": "Pusatfilm is a plugin that provides streaming links for movies and TV series.",
+        "url": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/Pusatfilm.cs3",
+        "name": "Pusatfilm"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=http://159.89.250.250&sz=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/nuyuls79/Nontonmovies",
+        "fileSize": 14642,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "ExtremeBoy"
+        ],
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "version": 1,
+        "internalName": "Rebahin",
+        "url": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/Rebahin.cs3",
+        "name": "Rebahin"
+    },
+    {
+        "iconUrl": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://v1.samehadaku.how&size=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/nuyuls79/Nontonmovies",
+        "fileSize": 20388,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Duro92",
+            "CodeSanzz"
+        ],
+        "tvTypes": [
+            "AnimeMovie",
+            "OVA",
+            "Anime"
+        ],
+        "version": 25,
+        "internalName": "Samehadaku",
+        "url": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/Samehadaku.cs3",
+        "name": "Samehadaku"
+    },
+    {
+        "jarFileSize": 128266,
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/nuyuls79/Nontonmovies",
+        "fileSize": 29937,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Hann"
+        ],
+        "tvTypes": [
+            "TvSeries",
+            "Movie",
+            "Anime",
+            "AsianDrama"
+        ],
+        "version": 1,
+        "internalName": "Sflix",
+        "jarUrl": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/Sflix.jar",
+        "description": "Sflix - Movie & Series subtitle indonesia",
+        "url": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/Sflix.cs3",
+        "name": "Sflix"
+    },
+    {
+        "iconUrl": "https://github.com/duro92/ExtCloud/blob/main/SoraStream/Icon.png",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/nuyuls79/Nontonmovies",
+        "fileSize": 178970,
+        "status": 1,
+        "language": "en",
+        "authors": [
+            "Hexated",
+            "Sora"
+        ],
+        "tvTypes": [
+            "AsianDrama",
+            "TvSeries",
+            "Anime",
+            "Movie"
+        ],
+        "version": 235,
+        "internalName": "SoraStream",
+        "description": "#1 best extention based on MultiAPI",
+        "url": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/SoraStream.cs3",
+        "name": "SoraStream"
+    },
+    {
+        "iconUrl": "https://img.watch32.sx/xxrz/400x400/100/a9/5e/a95e15a880a9df3c045f6a5224daf576/a95e15a880a9df3c045f6a5224daf576.png",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/nuyuls79/Nontonmovies",
+        "fileSize": 38594,
+        "status": 1,
+        "language": "en",
+        "authors": [
+            "Phisher98"
+        ],
+        "tvTypes": [
+            "Movies",
+            "TvSeries"
+        ],
+        "version": 10,
+        "internalName": "Watch32",
+        "description": "Watch movies and series from Watch32",
+        "url": "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/builds/Watch32.cs3",
+        "name": "Watch32"
+    }
+]

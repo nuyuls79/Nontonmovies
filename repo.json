@@ -1,0 +1,9 @@
+{
+    "name": "WadukStream",
+    "description": "Cloudstream  collection",
+    "iconUrl": "https://ibb.co.com/9mdpbhNh",
+    "manifestVersion": 1,
+    "pluginLists": [
+      "https://raw.githubusercontent.com/nuyuls79/Nontonmovies/refs/heads/builds/plugins.json"
+    ]
+}
