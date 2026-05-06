@@ -251,53 +251,81 @@ class Pahe : MainAPI() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ): Boolean {
-
+    
         val doc = app.get(
             data,
             headers = headers
         ).document
-
+    
+        val links = mutableSetOf<String>()
+    
+        // ambil semua href
         doc.select("a[href]").forEach { element ->
-
-            val link = element.attr("href")
-
+    
+            val href = element.attr("href").trim()
+    
             if (
-                link.contains("pixeldrain") ||
-                link.contains("mega.nz") ||
-                link.contains("mediafire") ||
-                link.contains("gofile") ||
-                link.contains("1fichier") ||
-                link.contains("streamwish") ||
-                link.contains("filelions") ||
-                link.contains("vidhide") ||
-                link.contains("streamtape") ||
-                link.contains("drive.google")
+                href.contains("pixeldrain", true) ||
+                href.contains("mega.nz", true) ||
+                href.contains("mediafire", true) ||
+                href.contains("gofile", true) ||
+                href.contains("1fichier", true) ||
+                href.contains("streamwish", true) ||
+                href.contains("filelions", true) ||
+                href.contains("vidhide", true) ||
+                href.contains("streamtape", true) ||
+                href.contains("drive.google", true) ||
+                href.contains("dood", true) ||
+                href.contains("streamsb", true) ||
+                href.contains("sbplay", true) ||
+                href.contains("watchsb", true) ||
+                href.contains("mixdrop", true) ||
+                href.contains("mp4upload", true)
             ) {
-
+                links.add(fixUrl(href))
+            }
+        }
+    
+        // iframe support
+        doc.select("iframe[src]").forEach {
+    
+            val src = it.attr("src").trim()
+    
+            if (src.isNotBlank()) {
+                links.add(fixUrl(src))
+            }
+        }
+    
+        // redirect page support
+        doc.select("button[onclick], div[onclick]").forEach {
+    
+            val onclick = it.attr("onclick")
+    
+            Regex("""https?:\/\/[^\s'"]+""")
+                .findAll(onclick)
+                .forEach { match ->
+                    links.add(match.value)
+                }
+        }
+    
+        if (links.isEmpty()) {
+            return false
+        }
+    
+        links.forEach { link ->
+    
+            try {
+    
                 loadExtractor(
                     link,
                     data,
                     subtitleCallback,
                     callback
                 )
+    
+            } catch (_: Exception) {
             }
         }
-
-        doc.select("iframe").forEach {
-
-            val src = it.attr("src")
-
-            if (src.isNotBlank()) {
-
-                loadExtractor(
-                    fixUrl(src),
-                    data,
-                    subtitleCallback,
-                    callback
-                )
-            }
-        }
-
-        return true
-    }
+    
+     return true
 }
