@@ -1,279 +1,294 @@
 package com.indo
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import com.lagradost.cloudstream3.*
+import com.lagradost.cloudstream3.LoadResponse.Companion.addActors
 import com.lagradost.cloudstream3.utils.*
-import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 
 class Pahe : MainAPI() {
 
     override var mainUrl = "https://pahe.ink"
-
     override var name = "Pahe"
-
     override val hasMainPage = true
-
-    override var lang = "id"
-
-    override val hasDownloadSupport = true
+    override var lang = "en"
 
     override val supportedTypes = setOf(
         TvType.Movie,
         TvType.TvSeries
     )
 
-    private val headers = mapOf(
-        "User-Agent" to
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-        "Referer" to "$mainUrl/"
-    )
+    // =========================
+    // MAIN PAGE
+    // =========================
 
     override val mainPage = mainPageOf(
-
-        "$mainUrl/wp-json/wp/v2/posts?categories=254&per_page=20&page=" to "🔥 Terbaru",
-
-        "$mainUrl/wp-json/wp/v2/posts?categories=37&per_page=20&page=" to "🎬 Action",
-        "$mainUrl/wp-json/wp/v2/posts?categories=48&per_page=20&page=" to "🗺 Adventure",
-        "$mainUrl/wp-json/wp/v2/posts?categories=38&per_page=20&page=" to "🧸 Animation",
-        "$mainUrl/wp-json/wp/v2/posts?categories=39&per_page=20&page=" to "😂 Comedy",
-        "$mainUrl/wp-json/wp/v2/posts?categories=50&per_page=20&page=" to "🕵 Crime",
-        "$mainUrl/wp-json/wp/v2/posts?categories=51&per_page=20&page=" to "🎭 Drama",
-        "$mainUrl/wp-json/wp/v2/posts?categories=52&per_page=20&page=" to "🧙 Fantasy",
-        "$mainUrl/wp-json/wp/v2/posts?categories=43&per_page=20&page=" to "👻 Horror",
-        "$mainUrl/wp-json/wp/v2/posts?categories=55&per_page=20&page=" to "❓ Mystery",
-        "$mainUrl/wp-json/wp/v2/posts?categories=45&per_page=20&page=" to "❤️ Romance",
-        "$mainUrl/wp-json/wp/v2/posts?categories=56&per_page=20&page=" to "🚀 Sci-Fi",
-        "$mainUrl/wp-json/wp/v2/posts?categories=57&per_page=20&page=" to "🔪 Thriller",
-
-        "$mainUrl/wp-json/wp/v2/posts?categories=439&per_page=20&page=" to "📺 TV Shows",
-        "$mainUrl/wp-json/wp/v2/posts?categories=872&per_page=20&page=" to "📡 Ongoing TV"
+        "$mainUrl/category/action/" to "🎬 Action",
+        "$mainUrl/category/adventure/" to "🗺 Adventure",
+        "$mainUrl/category/animation/" to "🧸 Animation",
+        "$mainUrl/category/comedy/" to "😂 Comedy",
+        "$mainUrl/category/crime/" to "🕵 Crime",
+        "$mainUrl/category/drama/" to "🎭 Drama",
+        "$mainUrl/category/fantasy/" to "🧙 Fantasy",
+        "$mainUrl/category/horror/" to "👻 Horror",
+        "$mainUrl/category/mystery/" to "🔎 Mystery",
+        "$mainUrl/category/romance/" to "❤️ Romance",
+        "$mainUrl/category/sci-fi/" to "🚀 Sci-Fi",
+        "$mainUrl/category/thriller/" to "🔪 Thriller",
+        "$mainUrl/category/tv-drama/" to "📺 TV Drama",
+        "$mainUrl/category/tv-action/" to "📺 TV Action",
+        "$mainUrl/category/tv-comedy/" to "📺 TV Comedy",
     )
 
-    data class WPPost(
-        val id: Int? = null,
-        val link: String? = null,
-        val title: Rendered? = null
-    )
-
-    data class Rendered(
-        val rendered: String? = null
-    )
+    // =========================
+    // MAIN PAGE LOADER
+    // =========================
 
     override suspend fun getMainPage(
         page: Int,
         request: MainPageRequest
     ): HomePageResponse {
 
-        val url = request.data + page
+        val genre = request.data
+            .substringAfter("/category/")
+            .substringBefore("/")
 
-        val response = app.get(
-            url,
-            headers = headers
-        ).text
+        val items = getGenrePosts(genre, page)
 
-        val posts = try {
+        return HomePageResponse(
+            listOf(
+                HomePageList(
+                    request.name,
+                    items,
+                    isHorizontalImages = true
+                )
+            ),
+            hasNext = true
+        )
+    }
 
-            mapper.readValue<List<WPPost>>(response)
+    // =========================
+    // GET GENRE POSTS
+    // =========================
 
-        } catch (_: Exception) {
+    private suspend fun getGenrePosts(
+        genre: String,
+        page: Int = 1
+    ): List<SearchResponse> {
 
-            emptyList()
-        }
+        val url =
+            if (page == 1)
+                "$mainUrl/category/$genre/"
+            else
+                "$mainUrl/category/$genre/page/$page/"
 
-        val home = posts.mapNotNull { post ->
+        val doc = app.get(url).document
 
-            try {
+        val items = mutableListOf<SearchResponse>()
 
-                val link = post.link ?: return@mapNotNull null
+        doc.select("article").forEach { article ->
 
-                val title = Jsoup
-                    .parse(post.title?.rendered ?: "")
-                    .text()
+            val title =
+                article.selectFirst("h2 a, h3 a")
+                    ?.text()
+                    ?.trim()
+                    ?: return@forEach
 
-                if (title.isBlank()) return@mapNotNull null
+            val link =
+                article.selectFirst("h2 a, h3 a")
+                    ?.attr("href")
+                    ?: return@forEach
 
-                val detailDoc = app.get(
-                    link,
-                    headers = headers
-                ).document
+            if (!link.startsWith(mainUrl))
+                return@forEach
 
-                var poster = detailDoc.selectFirst(
-                    "meta[property=og:image]"
-                )?.attr("content")
+            // =========================
+            // DETAIL PAGE
+            // =========================
 
-                if (poster.isNullOrBlank()) {
-                    poster = detailDoc.selectFirst(
-                        ".entry-content img"
-                    )?.attr("src")
-                }
+            val detailDoc = app.get(link).document
 
-                if (poster.isNullOrBlank()) {
-                    poster = detailDoc.selectFirst(
-                        "img"
-                    )?.attr("src")
-                }
+            var poster: String? = null
 
-                val type = if (
-                    title.contains("Season", true) ||
-                    title.contains("Episode", true) ||
-                    title.contains("S0", true)
+            detailDoc.select("img").forEach { img ->
+
+                val src = img.attr("src")
+
+                if (
+                    src.contains("/wp-content/uploads/") &&
+                    !src.contains("gravatar") &&
+                    !src.contains("amazon") &&
+                    !src.contains("transparent") &&
+                    !src.contains("logo") &&
+                    !src.contains("icon")
                 ) {
-                    TvType.TvSeries
-                } else {
-                    TvType.Movie
-                }
 
+                    poster = src
+                        .replace("-110x153", "")
+                        .replace("-150x150", "")
+                        .replace("-75x75", "")
+
+                    return@forEach
+                }
+            }
+
+            println("TITLE => $title")
+            println("POSTER => $poster")
+
+            items.add(
                 newMovieSearchResponse(
                     title,
                     link,
-                    type
+                    TvType.Movie
                 ) {
-                    posterUrl = poster
+                    this.posterUrl = poster
                 }
-
-            } catch (_: Exception) {
-                null
-            }
+            )
         }
 
-        return newHomePageResponse(
-            request.name,
-            home
-        )
+        return items.distinctBy { it.url }
     }
+
+    // =========================
+    // SEARCH
+    // =========================
 
     override suspend fun search(
         query: String
     ): List<SearchResponse> {
 
         val url =
-            "$mainUrl/wp-json/wp/v2/posts?search=${query}&per_page=20"
+            "$mainUrl/?s=${query.replace(" ", "+")}"
 
-        val response = app.get(
-            url,
-            headers = headers
-        ).text
+        val doc = app.get(url).document
 
-        val posts = try {
+        val items = mutableListOf<SearchResponse>()
 
-            mapper.readValue<List<WPPost>>(response)
+        doc.select("article").forEach { article ->
 
-        } catch (_: Exception) {
+            val title =
+                article.selectFirst("h2 a, h3 a")
+                    ?.text()
+                    ?.trim()
+                    ?: return@forEach
 
-            emptyList()
-        }
+            val link =
+                article.selectFirst("h2 a, h3 a")
+                    ?.attr("href")
+                    ?: return@forEach
 
-        return posts.mapNotNull { post ->
+            val detailDoc = app.get(link).document
 
-            try {
+            var poster: String? = null
 
-                val link = post.link ?: return@mapNotNull null
+            detailDoc.select("img").forEach { img ->
 
-                val title = Jsoup
-                    .parse(post.title?.rendered ?: "")
-                    .text()
+                val src = img.attr("src")
 
-                if (title.isBlank()) return@mapNotNull null
-
-                val detailDoc = app.get(
-                    link,
-                    headers = headers
-                ).document
-
-                var poster = detailDoc.selectFirst(
-                    "meta[property=og:image]"
-                )?.attr("content")
-
-                if (poster.isNullOrBlank()) {
-                    poster = detailDoc.selectFirst(
-                        ".entry-content img"
-                    )?.attr("src")
-                }
-
-                val type = if (
-                    title.contains("Season", true) ||
-                    title.contains("Episode", true) ||
-                    title.contains("S0", true)
+                if (
+                    src.contains("/wp-content/uploads/") &&
+                    !src.contains("gravatar") &&
+                    !src.contains("amazon") &&
+                    !src.contains("transparent") &&
+                    !src.contains("logo") &&
+                    !src.contains("icon")
                 ) {
-                    TvType.TvSeries
-                } else {
-                    TvType.Movie
-                }
 
+                    poster = src
+                        .replace("-110x153", "")
+                        .replace("-150x150", "")
+                        .replace("-75x75", "")
+
+                    return@forEach
+                }
+            }
+
+            items.add(
                 newMovieSearchResponse(
                     title,
                     link,
-                    type
+                    TvType.Movie
                 ) {
-                    posterUrl = poster
+                    this.posterUrl = poster
                 }
-
-            } catch (_: Exception) {
-                null
-            }
+            )
         }
+
+        return items.distinctBy { it.url }
     }
 
-    override suspend fun load(
-        url: String
-    ): LoadResponse {
+    // =========================
+    // LOAD
+    // =========================
 
-        val doc = app.get(
-            url,
-            headers = headers
-        ).document
+    override suspend fun load(url: String): LoadResponse {
 
-        val title = doc.selectFirst(
-            "h1.entry-title"
-        )?.text()?.trim()
-            ?: "Unknown"
+        val doc = app.get(url).document
 
-        var poster = doc.selectFirst(
-            "meta[property=og:image]"
-        )?.attr("content")
+        val title =
+            doc.selectFirst("h1")
+                ?.text()
+                ?.trim()
+                ?: "Unknown"
 
-        if (poster.isNullOrBlank()) {
-            poster = doc.selectFirst(
-                ".entry-content img"
-            )?.attr("src")
+        val plot =
+            doc.selectFirst("meta[name=description]")
+                ?.attr("content")
+
+        var poster: String? = null
+
+        doc.select("img").forEach { img ->
+
+            val src = img.attr("src")
+
+            if (
+                src.contains("/wp-content/uploads/") &&
+                !src.contains("gravatar") &&
+                !src.contains("amazon") &&
+                !src.contains("transparent") &&
+                !src.contains("logo") &&
+                !src.contains("icon")
+            ) {
+
+                poster = src
+                    .replace("-110x153", "")
+                    .replace("-150x150", "")
+                    .replace("-75x75", "")
+
+                return@forEach
+            }
         }
 
-        val plot = doc.selectFirst(
-            ".entry-content p"
-        )?.text()
+        val links = mutableListOf<String>()
 
-        val tags = doc.select(
-            ".meta-single-cats a"
-        ).map {
-            it.text()
-        }
+        doc.select("a").forEach { a ->
 
-        val year = Regex("(19|20)\\d{2}")
-            .find(title)
-            ?.value
-            ?.toIntOrNull()
+            val href = a.attr("href")
 
-        val type = if (
-            title.contains("Season", true) ||
-            title.contains("Episode", true)
-        ) {
-            TvType.TvSeries
-        } else {
-            TvType.Movie
+            if (
+                href.contains("drive") ||
+                href.contains("gdflix") ||
+                href.contains("pixeldrain") ||
+                href.contains("hubcloud") ||
+                href.contains("pahe")
+            ) {
+                links.add(href)
+            }
         }
 
         return newMovieLoadResponse(
             title,
             url,
-            type,
-            url
+            TvType.Movie,
+            links.joinToString("\n")
         ) {
             posterUrl = poster
             this.plot = plot
-            this.tags = tags
-            this.year = year
         }
     }
+
+    // =========================
+    // LOAD LINKS
+    // =========================
 
     override suspend fun loadLinks(
         data: String,
@@ -282,73 +297,23 @@ class Pahe : MainAPI() {
         callback: (ExtractorLink) -> Unit
     ): Boolean {
 
-        val doc = app.get(
-            data,
-            headers = headers
-        ).document
+        data.lines().forEach { link ->
 
-        val selectors = listOf(
+            if (link.isNotBlank()) {
 
-            "a.shortc-button",
-            "a.su-button",
-            ".su-button-content a",
-            ".entry-content a[href]",
-            "div.entry-content a[href]"
-        )
-
-        val allowedHosts = listOf(
-            "pixeldrain",
-            "krakenfiles",
-            "buzzheavier",
-            "mediafire",
-            "gofile",
-            "streamwish",
-            "filelions",
-            "streamtape",
-            "dood",
-            "vidoza",
-            "mixdrop",
-            "mp4upload",
-            "mega.nz",
-            "1fichier",
-            "drive.google"
-        )
-
-        val links = mutableSetOf<String>()
-
-        selectors.forEach { selector ->
-
-            doc.select(selector).forEach { el ->
-
-                val href = el.attr("href").trim()
-
-                if (
-                    href.startsWith("http") &&
-                    allowedHosts.any {
-                        href.contains(it, true)
-                    }
-                ) {
-
-                    links.add(href)
-                }
-            }
-        }
-
-        links.forEach { link ->
-
-            try {
-
-                loadExtractor(
-                    link,
-                    data,
-                    subtitleCallback,
-                    callback
+                callback.invoke(
+                    ExtractorLink(
+                        source = name,
+                        name = "Pahe",
+                        url = link,
+                        referer = mainUrl,
+                        quality = Qualities.Unknown.value,
+                        type = INFER_TYPE
+                    )
                 )
-
-            } catch (_: Exception) {
             }
         }
 
-        return links.isNotEmpty()
+        return true
     }
 }
