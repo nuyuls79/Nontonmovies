@@ -33,43 +33,66 @@ class Pahe : MainAPI() {
         "$mainUrl/page/" to "🔥 Terbaru",
 
         // MOVIES
-        "$mainUrl/category/action/page/" to "🎬 Action",
-        "$mainUrl/category/adventure/page/" to "🗺 Adventure",
-        "$mainUrl/category/animation/page/" to "🧸 Animation",
-        "$mainUrl/category/comedy/page/" to "😂 Comedy",
-        "$mainUrl/category/crime/page/" to "🕵 Crime",
-        "$mainUrl/category/drama/page/" to "🎭 Drama",
-        "$mainUrl/category/fantasy/page/" to "🧙 Fantasy",
-        "$mainUrl/category/horror/page/" to "👻 Horror",
-        "$mainUrl/category/mystery/page/" to "❓ Mystery",
-        "$mainUrl/category/romance/page/" to "❤️ Romance",
-        "$mainUrl/category/sci-fi/page/" to "🚀 Sci-Fi",
-        "$mainUrl/category/thriller/page/" to "🔪 Thriller",
+        "$mainUrl/action/" to "🎬 Action",
+        "$mainUrl/adventure/" to "🗺 Adventure",
+        "$mainUrl/animation/" to "🧸 Animation",
+        "$mainUrl/comedy/" to "😂 Comedy",
+        "$mainUrl/crime/" to "🕵 Crime",
+        "$mainUrl/drama/" to "🎭 Drama",
+        "$mainUrl/fantasy/" to "🧙 Fantasy",
+        "$mainUrl/horror/" to "👻 Horror",
+        "$mainUrl/mystery/" to "❓ Mystery",
+        "$mainUrl/romance/" to "❤️ Romance",
+        "$mainUrl/sci-fi/" to "🚀 Sci-Fi",
+        "$mainUrl/thriller/" to "🔪 Thriller",
 
         // TV
-        "$mainUrl/category/tv-shows/page/" to "📺 TV Shows",
+        "$mainUrl/tv-shows/" to "📺 TV Shows",
 
         // DRAMA
-        "$mainUrl/category/korean-drama/page/" to "🇰🇷 Korean Drama",
-        "$mainUrl/category/japanese-drama/page/" to "🇯🇵 Japanese Drama",
-        "$mainUrl/category/chinese-drama/page/" to "🇨🇳 Chinese Drama",
-        "$mainUrl/category/thai-drama/page/" to "🇹🇭 Thai Drama",
+        "$mainUrl/korean-drama/" to "🇰🇷 Korean Drama",
+        "$mainUrl/chinese-drama/" to "🇨🇳 Chinese Drama",
+        "$mainUrl/japanese-drama/" to "🇯🇵 Japanese Drama",
+        "$mainUrl/thai-drama/" to "🇹🇭 Thai Drama",
+        "$mainUrl/indian-drama/" to "🇮🇳 Indian Drama",
 
         // ANIME
-        "$mainUrl/category/anime/page/" to "🎌 Anime"
+        "$mainUrl/anime/" to "🎌 Anime"
     )
 
     private fun Element.toSearchResult(): SearchResponse? {
 
-        val title = selectFirst(
-            ".tt, h1 a, h2 a, h3 a, .entry-title"
-        )?.text()?.trim()
+        val linkElement = selectFirst("a[href]")
             ?: return null
 
-        val href = selectFirst("a")
-            ?.attr("href")
-            ?.trim()
+        val href = linkElement.attr("href")
+            .trim()
+
+        if (!href.startsWith(mainUrl))
+            return null
+
+        val title = selectFirst(
+            """
+            .tt,
+            .entry-title,
+            h1,
+            h2,
+            h3,
+            img
+            """.trimIndent()
+        )?.let {
+
+            when (it.tagName()) {
+                "img" -> it.attr("alt")
+                else -> it.text()
+            }
+
+        }?.trim()
+            ?.replace("\n", " ")
             ?: return null
+
+        if (title.length < 2)
+            return null
 
         val poster = selectFirst("img")
             ?.let {
@@ -85,8 +108,6 @@ class Pahe : MainAPI() {
         val type = if (
             title.contains("Season", true) ||
             title.contains("Episode", true) ||
-            title.contains("S01", true) ||
-            title.contains("S02", true) ||
             title.contains("TV", true)
         ) {
             TvType.TvSeries
@@ -108,7 +129,15 @@ class Pahe : MainAPI() {
         request: MainPageRequest
     ): HomePageResponse {
 
-        val url = request.data + page
+        val url = if (request.data.contains("/page/")) {
+            request.data + page
+        } else {
+            if (page == 1) {
+                request.data
+            } else {
+                request.data + "page/$page/"
+            }
+        }
 
         val doc = app.get(
             url,
@@ -116,7 +145,16 @@ class Pahe : MainAPI() {
         ).document
 
         val home = doc.select(
-            "div.bsx, article, div.post-item, div.item, div.grid-item"
+            """
+            article,
+            article.post,
+            div.post,
+            div.bs,
+            div.bsx,
+            div.result-item,
+            div.listupd article,
+            li
+            """.trimIndent()
         ).mapNotNull {
             it.toSearchResult()
         }.distinctBy {
@@ -141,7 +179,13 @@ class Pahe : MainAPI() {
         ).document
 
         return doc.select(
-            "div.bsx, article, div.post-item, div.item, div.grid-item"
+            """
+            article,
+            article.post,
+            div.post,
+            div.bs,
+            div.bsx
+            """.trimIndent()
         ).mapNotNull {
             it.toSearchResult()
         }.distinctBy {
@@ -174,15 +218,15 @@ class Pahe : MainAPI() {
             .trim()
 
         val poster = doc.selectFirst(
-            "div.entry-content img, .thumb img, img"
+            "div.entry-content img, img"
         )?.attr("src")
 
         val plot = doc.selectFirst(
-            "div.entry-content p, .entry-content p"
+            "div.entry-content p"
         )?.text()?.trim()
 
         val tags = doc.select(
-            "a[rel=category tag], a[href*=category]"
+            "a[rel=category tag], a[href*=genre]"
         ).map {
             it.text()
         }.filter {
