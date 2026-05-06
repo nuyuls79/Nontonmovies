@@ -1,5 +1,6 @@
 package com.indo
 
+import com.fasterxml.jackson.module.kotlin.readValue
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
 import org.jsoup.Jsoup
@@ -49,13 +50,13 @@ class Pahe : MainAPI() {
     )
 
     data class WPPost(
-        val id: Int,
-        val link: String,
-        val title: Rendered
+        val id: Int? = null,
+        val link: String? = null,
+        val title: Rendered? = null
     )
 
     data class Rendered(
-        val rendered: String
+        val rendered: String? = null
     )
 
     override suspend fun getMainPage(
@@ -65,21 +66,34 @@ class Pahe : MainAPI() {
 
         val url = request.data + page
 
-        val posts = app.get(
+        val response = app.get(
             url,
             headers = headers
-        ).parsedSafe<List<WPPost>>() ?: emptyList()
+        ).text
+
+        val posts = try {
+
+            mapper.readValue<List<WPPost>>(response)
+
+        } catch (_: Exception) {
+
+            emptyList()
+        }
 
         val home = posts.mapNotNull { post ->
 
             try {
 
+                val link = post.link ?: return@mapNotNull null
+
                 val title = Jsoup
-                    .parse(post.title.rendered)
+                    .parse(post.title?.rendered ?: "")
                     .text()
 
+                if (title.isBlank()) return@mapNotNull null
+
                 val detailDoc = app.get(
-                    post.link,
+                    link,
                     headers = headers
                 ).document
 
@@ -111,7 +125,7 @@ class Pahe : MainAPI() {
 
                 newMovieSearchResponse(
                     title,
-                    post.link,
+                    link,
                     type
                 ) {
                     posterUrl = poster
@@ -135,21 +149,34 @@ class Pahe : MainAPI() {
         val url =
             "$mainUrl/wp-json/wp/v2/posts?search=${query}&per_page=20"
 
-        val posts = app.get(
+        val response = app.get(
             url,
             headers = headers
-        ).parsedSafe<List<WPPost>>() ?: emptyList()
+        ).text
+
+        val posts = try {
+
+            mapper.readValue<List<WPPost>>(response)
+
+        } catch (_: Exception) {
+
+            emptyList()
+        }
 
         return posts.mapNotNull { post ->
 
             try {
 
+                val link = post.link ?: return@mapNotNull null
+
                 val title = Jsoup
-                    .parse(post.title.rendered)
+                    .parse(post.title?.rendered ?: "")
                     .text()
 
+                if (title.isBlank()) return@mapNotNull null
+
                 val detailDoc = app.get(
-                    post.link,
+                    link,
                     headers = headers
                 ).document
 
@@ -175,7 +202,7 @@ class Pahe : MainAPI() {
 
                 newMovieSearchResponse(
                     title,
-                    post.link,
+                    link,
                     type
                 ) {
                     posterUrl = poster
