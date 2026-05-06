@@ -1,9 +1,7 @@
 package com.indo
 
 import com.lagradost.cloudstream3.*
-import com.lagradost.cloudstream3.LoadResponse.Companion.addActors
 import com.lagradost.cloudstream3.utils.*
-import org.jsoup.nodes.Document
 
 class Pahe : MainAPI() {
 
@@ -15,6 +13,12 @@ class Pahe : MainAPI() {
     override val supportedTypes = setOf(
         TvType.Movie,
         TvType.TvSeries
+    )
+
+    private val headers = mapOf(
+        "User-Agent" to
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "Referer" to "$mainUrl/"
     )
 
     // =========================
@@ -43,28 +47,28 @@ class Pahe : MainAPI() {
     // MAIN PAGE LOADER
     // =========================
 
-override suspend fun getMainPage(
-    page: Int,
-    request: MainPageRequest
-): HomePageResponse {
+    override suspend fun getMainPage(
+        page: Int,
+        request: MainPageRequest
+    ): HomePageResponse {
 
-    val genre = request.data
-        .substringAfter("/category/")
-        .substringBefore("/")
+        val genre = request.data
+            .substringAfter("/category/")
+            .substringBefore("/")
 
-    val items = getGenrePosts(genre, page)
+        val items = getGenrePosts(genre, page)
 
-    return newHomePageResponse(
-        listOf(
-            HomePageList(
-                request.name,
-                items,
-                isHorizontalImages = true
-            )
-        ),
-        hasNext = true
-    )
-}
+        return newHomePageResponse(
+            listOf(
+                HomePageList(
+                    request.name,
+                    items,
+                    isHorizontalImages = true
+                )
+            ),
+            hasNext = true
+        )
+    }
 
     // =========================
     // GET GENRE POSTS
@@ -81,31 +85,33 @@ override suspend fun getMainPage(
             else
                 "$mainUrl/category/$genre/page/$page/"
 
-        val doc = app.get(url).document
+        val doc = app.get(
+            url,
+            headers = headers
+        ).document
 
         val items = mutableListOf<SearchResponse>()
 
         doc.select("article").forEach { article ->
 
-            val title =
-                article.selectFirst("h2 a, h3 a")
-                    ?.text()
-                    ?.trim()
-                    ?: return@forEach
+            val title = article
+                .selectFirst("h2 a, h3 a")
+                ?.text()
+                ?.trim()
+                ?: return@forEach
 
-            val link =
-                article.selectFirst("h2 a, h3 a")
-                    ?.attr("href")
-                    ?: return@forEach
+            val link = article
+                .selectFirst("h2 a, h3 a")
+                ?.attr("href")
+                ?: return@forEach
 
             if (!link.startsWith(mainUrl))
                 return@forEach
 
-            // =========================
-            // DETAIL PAGE
-            // =========================
-
-            val detailDoc = app.get(link).document
+            val detailDoc = app.get(
+                link,
+                headers = headers
+            ).document
 
             var poster: String? = null
 
@@ -131,14 +137,21 @@ override suspend fun getMainPage(
                 }
             }
 
-            println("TITLE => $title")
-            println("POSTER => $poster")
+            val type = if (
+                title.contains("Season", true) ||
+                title.contains("Episode", true) ||
+                title.contains("S01", true)
+            ) {
+                TvType.TvSeries
+            } else {
+                TvType.Movie
+            }
 
             items.add(
                 newMovieSearchResponse(
                     title,
                     link,
-                    TvType.Movie
+                    type
                 ) {
                     this.posterUrl = poster
                 }
@@ -159,24 +172,30 @@ override suspend fun getMainPage(
         val url =
             "$mainUrl/?s=${query.replace(" ", "+")}"
 
-        val doc = app.get(url).document
+        val doc = app.get(
+            url,
+            headers = headers
+        ).document
 
         val items = mutableListOf<SearchResponse>()
 
         doc.select("article").forEach { article ->
 
-            val title =
-                article.selectFirst("h2 a, h3 a")
-                    ?.text()
-                    ?.trim()
-                    ?: return@forEach
+            val title = article
+                .selectFirst("h2 a, h3 a")
+                ?.text()
+                ?.trim()
+                ?: return@forEach
 
-            val link =
-                article.selectFirst("h2 a, h3 a")
-                    ?.attr("href")
-                    ?: return@forEach
+            val link = article
+                .selectFirst("h2 a, h3 a")
+                ?.attr("href")
+                ?: return@forEach
 
-            val detailDoc = app.get(link).document
+            val detailDoc = app.get(
+                link,
+                headers = headers
+            ).document
 
             var poster: String? = null
 
@@ -202,11 +221,21 @@ override suspend fun getMainPage(
                 }
             }
 
+            val type = if (
+                title.contains("Season", true) ||
+                title.contains("Episode", true) ||
+                title.contains("S01", true)
+            ) {
+                TvType.TvSeries
+            } else {
+                TvType.Movie
+            }
+
             items.add(
                 newMovieSearchResponse(
                     title,
                     link,
-                    TvType.Movie
+                    type
                 ) {
                     this.posterUrl = poster
                 }
@@ -220,19 +249,24 @@ override suspend fun getMainPage(
     // LOAD
     // =========================
 
-    override suspend fun load(url: String): LoadResponse {
+    override suspend fun load(
+        url: String
+    ): LoadResponse {
 
-        val doc = app.get(url).document
+        val doc = app.get(
+            url,
+            headers = headers
+        ).document
 
-        val title =
-            doc.selectFirst("h1")
-                ?.text()
-                ?.trim()
-                ?: "Unknown"
+        val title = doc
+            .selectFirst("h1")
+            ?.text()
+            ?.trim()
+            ?: "Unknown"
 
-        val plot =
-            doc.selectFirst("meta[name=description]")
-                ?.attr("content")
+        val plot = doc
+            .selectFirst("meta[name=description]")
+            ?.attr("content")
 
         var poster: String? = null
 
@@ -260,25 +294,35 @@ override suspend fun getMainPage(
 
         val links = mutableListOf<String>()
 
-        doc.select("a").forEach { a ->
+        doc.select("a[href]").forEach { a ->
 
             val href = a.attr("href")
 
             if (
-                href.contains("drive") ||
-                href.contains("gdflix") ||
-                href.contains("pixeldrain") ||
-                href.contains("hubcloud") ||
-                href.contains("pahe")
+                href.contains("drive", true) ||
+                href.contains("gdflix", true) ||
+                href.contains("pixeldrain", true) ||
+                href.contains("hubcloud", true) ||
+                href.contains("krakenfiles", true) ||
+                href.contains("mediafire", true)
             ) {
                 links.add(href)
             }
         }
 
+        val type = if (
+            title.contains("Season", true) ||
+            title.contains("Episode", true)
+        ) {
+            TvType.TvSeries
+        } else {
+            TvType.Movie
+        }
+
         return newMovieLoadResponse(
             title,
             url,
-            TvType.Movie,
+            type,
             links.joinToString("\n")
         ) {
             posterUrl = poster
@@ -290,30 +334,31 @@ override suspend fun getMainPage(
     // LOAD LINKS
     // =========================
 
-override suspend fun loadLinks(
-    data: String,
-    isCasting: Boolean,
-    subtitleCallback: (SubtitleFile) -> Unit,
-    callback: (ExtractorLink) -> Unit
-): Boolean {
+    override suspend fun loadLinks(
+        data: String,
+        isCasting: Boolean,
+        subtitleCallback: (SubtitleFile) -> Unit,
+        callback: (ExtractorLink) -> Unit
+    ): Boolean {
 
-    data.lines().forEach { link ->
+        data.lines().forEach { link ->
 
-        if (link.isNotBlank()) {
+            if (link.isNotBlank()) {
 
-            callback.invoke(
-                newExtractorLink(
-                    source = name,
-                    name = "Pahe",
-                    url = link,
-                    type = INFER_TYPE
-                ) {
-                    this.referer = mainUrl
-                    this.quality = Qualities.Unknown.value
-                }
-            )
+                callback.invoke(
+                    newExtractorLink(
+                        source = name,
+                        name = "Pahe",
+                        url = link,
+                        type = INFER_TYPE
+                    ) {
+                        this.referer = mainUrl
+                        this.quality = Qualities.Unknown.value
+                    }
+                )
+            }
         }
-    }
 
-    return true
+        return true
+    }
 }
