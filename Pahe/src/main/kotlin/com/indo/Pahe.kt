@@ -43,28 +43,28 @@ class Pahe : MainAPI() {
     // MAIN PAGE LOADER
     // =========================
 
-    override suspend fun getMainPage(
-        page: Int,
-        request: MainPageRequest
-    ): HomePageResponse {
+override suspend fun getMainPage(
+    page: Int,
+    request: MainPageRequest
+): HomePageResponse {
 
-        val genre = request.data
-            .substringAfter("/category/")
-            .substringBefore("/")
+    val genre = request.data
+        .substringAfter("/category/")
+        .substringBefore("/")
 
-        val items = getGenrePosts(genre, page)
+    val items = getGenrePosts(genre, page)
 
-        return HomePageResponse(
-            listOf(
-                HomePageList(
-                    request.name,
-                    items,
-                    isHorizontalImages = true
-                )
-            ),
-            hasNext = true
-        )
-    }
+    return newHomePageResponse(
+        listOf(
+            HomePageList(
+                request.name,
+                items,
+                isHorizontalImages = true
+            )
+        ),
+        hasNext = true
+    )
+}
 
     // =========================
     // GET GENRE POSTS
@@ -290,30 +290,30 @@ class Pahe : MainAPI() {
     // LOAD LINKS
     // =========================
 
-    override suspend fun loadLinks(
-        data: String,
-        isCasting: Boolean,
-        subtitleCallback: (SubtitleFile) -> Unit,
-        callback: (ExtractorLink) -> Unit
-    ): Boolean {
+override suspend fun loadLinks(
+    data: String,
+    isCasting: Boolean,
+    subtitleCallback: (SubtitleFile) -> Unit,
+    callback: (ExtractorLink) -> Unit
+): Boolean {
 
-        data.lines().forEach { link ->
+    data.lines().forEach { link ->
 
-            if (link.isNotBlank()) {
+        if (link.isNotBlank()) {
 
-                callback.invoke(
-                    ExtractorLink(
-                        source = name,
-                        name = "Pahe",
-                        url = link,
-                        referer = mainUrl,
-                        quality = Qualities.Unknown.value,
-                        type = INFER_TYPE
-                    )
-                )
-            }
+            callback.invoke(
+                newExtractorLink(
+                    source = name,
+                    name = "Pahe",
+                    url = link,
+                    type = INFER_TYPE
+                ) {
+                    this.referer = mainUrl
+                    this.quality = Qualities.Unknown.value
+                }
+            )
         }
-
-        return true
     }
+
+    return true
 }
