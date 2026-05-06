@@ -74,92 +74,144 @@ class Pahe : MainAPI() {
     // GET GENRE POSTS
     // =========================
 
-    private suspend fun getGenrePosts(
-        genre: String,
-        page: Int = 1
-    ): List<SearchResponse> {
+private suspend fun getGenrePosts(
+    genre: String,
+    page: Int = 1
+): List<SearchResponse> {
 
-        val url =
-            if (page == 1)
-                "$mainUrl/category/$genre/"
-            else
-                "$mainUrl/category/$genre/page/$page/"
+    val url =
+        if (page == 1)
+            "$mainUrl/category/$genre/"
+        else
+            "$mainUrl/category/$genre/page/$page/"
 
-        val doc = app.get(
-            url,
-            headers = headers
-        ).document
+    val doc = app.get(
+        url,
+        headers = headers
+    ).document
 
-        val items = mutableListOf<SearchResponse>()
+    val items = mutableListOf<SearchResponse>()
 
-        doc.select("article").forEach { article ->
+    // selector baru lebih stabil
+    val posts = doc.select(
+        "article.post, div.post, div.tie-col-md-11, li.post"
+    )
 
-            val title = article
-                .selectFirst("h2 a, h3 a")
-                ?.text()
-                ?.trim()
-                ?: return@forEach
+    println("GENRE => $genre")
+    println("TOTAL POSTS => ${posts.size}")
 
-            val link = article
-                .selectFirst("h2 a, h3 a")
-                ?.attr("href")
-                ?: return@forEach
+    posts.forEach { article ->
 
-            if (!link.startsWith(mainUrl))
-                return@forEach
+        val a = article.selectFirst("h2 a, h3 a, a[rel=bookmark]")
+            ?: return@forEach
 
-            val detailDoc = app.get(
-                link,
-                headers = headers
-            ).document
+        val title = a.text().trim()
 
-            var poster: String? = null
+        val link = a.attr("href").trim()
 
-            detailDoc.select("img").forEach { img ->
+        if (
+            title.isBlank() ||
+            link.isBlank() ||
+            !link.startsWith(mainUrl)
+        ) return@forEach
 
-                val src = img.attr("src")
+        // =========================
+        // POSTER
+        // =========================
 
-                if (
-                    src.contains("/wp-content/uploads/") &&
-                    !src.contains("gravatar") &&
-                    !src.contains("amazon") &&
-                    !src.contains("transparent") &&
-                    !src.contains("logo") &&
-                    !src.contains("icon")
-                ) {
+        var poster: String? = null
 
-                    poster = src
-                        .replace("-110x153", "")
-                        .replace("-150x150", "")
-                        .replace("-75x75", "")
+        // ambil poster langsung dari halaman category dulu
+        article.select("img").forEach { img ->
 
-                    return@forEach
-                }
-            }
+            val src = img.attr("data-src")
+                .ifBlank { img.attr("src") }
 
-            val type = if (
-                title.contains("Season", true) ||
-                title.contains("Episode", true) ||
-                title.contains("S01", true)
+            if (
+                src.contains("/wp-content/uploads/") &&
+                !src.contains("gravatar") &&
+                !src.contains("amazon") &&
+                !src.contains("transparent") &&
+                !src.contains("logo")
             ) {
-                TvType.TvSeries
-            } else {
-                TvType.Movie
-            }
 
-            items.add(
-                newMovieSearchResponse(
-                    title,
-                    link,
-                    type
-                ) {
-                    this.posterUrl = poster
-                }
-            )
+                poster = src
+                    .replace("-110x153", "")
+                    .replace("-150x150", "")
+                    .replace("-75x75", "")
+                    .replace("-75x106", "")
+                    .replace("-220x150", "")
+
+                return@forEach
+            }
         }
 
-        return items.distinctBy { it.url }
+        // fallback ambil dari detail page
+        if (poster == null) {
+
+            try {
+
+                val detailDoc = app.get(
+                    link,
+                    headers = headers
+                ).document
+
+                detailDoc.select("img").forEach { img ->
+
+                    val src = img.attr("data-src")
+                        .ifBlank { img.attr("src") }
+
+                    if (
+                        src.contains("/wp-content/uploads/") &&
+                        !src.contains("gravatar") &&
+                        !src.contains("amazon") &&
+                        !src.contains("transparent") &&
+                        !src.contains("logo")
+                    ) {
+
+                        poster = src
+                            .replace("-110x153", "")
+                            .replace("-150x150", "")
+                            .replace("-75x75", "")
+                            .replace("-75x106", "")
+                            .replace("-220x150", "")
+
+                        return@forEach
+                    }
+                }
+
+            } catch (_: Exception) {
+            }
+        }
+
+        println("TITLE => $title")
+        println("POSTER => $poster")
+
+        val type = if (
+            title.contains("Season", true) ||
+            title.contains("Episode", true) ||
+            title.contains("S01", true)
+        ) {
+            TvType.TvSeries
+        } else {
+            TvType.Movie
+        }
+
+        items.add(
+            newMovieSearchResponse(
+                title,
+                link,
+                type
+            ) {
+                this.posterUrl = poster
+            }
+        )
     }
+
+    return items
+        .distinctBy { it.url }
+        .take(30)
+}
 
     // =========================
     // SEARCH
