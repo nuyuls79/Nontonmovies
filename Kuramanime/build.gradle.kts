@@ -1,12 +1,12 @@
 // use an integer for version numbers
-version = 18
+version = 6
 
 
 cloudstream {
     language = "id"
     // All of these properties are optional, you can safely remove them
 
-    description = "rekuesan om Hadi Sulianto"
+    // description = "Lorem Ipsum"
     authors = listOf("aldry84")
 
     /**
@@ -18,12 +18,10 @@ cloudstream {
      * */
     status = 1 // will be 3 if unspecified
     tvTypes = listOf(
-        "AsianDrama",
-        "TvSeries",
-        "Movie",
+        "Anime",
     )
 
 
-    iconUrl = "https://www.google.com/s2/favicons?domain=tv7.lk21.am.in&sz=%size%"
+    iconUrl = "https://v8.kuramanime.blog/assets/img/logo-full-512.png"
 
 }
