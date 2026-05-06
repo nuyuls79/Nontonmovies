@@ -32,7 +32,7 @@ class Pahe : MainAPI() {
         // TERBARU
         "$mainUrl/page/" to "🔥 Terbaru",
 
-        // MOVIE GENRE
+        // MOVIES
         "$mainUrl/category/action/page/" to "🎬 Action",
         "$mainUrl/category/adventure/page/" to "🗺 Adventure",
         "$mainUrl/category/animation/page/" to "🧸 Animation",
@@ -46,39 +46,38 @@ class Pahe : MainAPI() {
         "$mainUrl/category/sci-fi/page/" to "🚀 Sci-Fi",
         "$mainUrl/category/thriller/page/" to "🔪 Thriller",
 
-        // TV SHOW
-        "$mainUrl/tv-show/page/" to "📺 TV Show",
-        "$mainUrl/tv-show/ongoing/page/" to "📡 Ongoing TV",
+        // TV
+        "$mainUrl/category/tv-shows/page/" to "📺 TV Shows",
 
         // DRAMA
-        "$mainUrl/korean-drama/page/" to "🇰🇷 Korean Drama",
-        "$mainUrl/japanese-drama/page/" to "🇯🇵 Japanese Drama",
-        "$mainUrl/chinese-drama/page/" to "🇨🇳 Chinese Drama",
-        "$mainUrl/thai-drama/page/" to "🇹🇭 Thai Drama",
-        "$mainUrl/indian-drama/page/" to "🇮🇳 Indian Drama",
-        "$mainUrl/turkish-drama/page/" to "🇹🇷 Turkish Drama",
+        "$mainUrl/category/korean-drama/page/" to "🇰🇷 Korean Drama",
+        "$mainUrl/category/japanese-drama/page/" to "🇯🇵 Japanese Drama",
+        "$mainUrl/category/chinese-drama/page/" to "🇨🇳 Chinese Drama",
+        "$mainUrl/category/thai-drama/page/" to "🇹🇭 Thai Drama",
 
         // ANIME
-        "$mainUrl/anime/movie/page/" to "🎌 Anime Movie",
-        "$mainUrl/anime/tv/page/" to "📺 Anime TV"
+        "$mainUrl/category/anime/page/" to "🎌 Anime"
     )
 
     private fun Element.toSearchResult(): SearchResponse? {
 
-        val title = selectFirst(".tt")
-            ?.text()
-            ?.trim()
+        val title = selectFirst(
+            ".tt, h1 a, h2 a, h3 a, .entry-title"
+        )?.text()?.trim()
             ?: return null
 
         val href = selectFirst("a")
             ?.attr("href")
+            ?.trim()
             ?: return null
 
         val poster = selectFirst("img")
             ?.let {
                 it.attr("data-src").ifBlank {
                     it.attr("data-lazy-src").ifBlank {
-                        it.attr("src")
+                        it.attr("src").ifBlank {
+                            it.attr("data-cfsrc")
+                        }
                     }
                 }
             }
@@ -87,7 +86,8 @@ class Pahe : MainAPI() {
             title.contains("Season", true) ||
             title.contains("Episode", true) ||
             title.contains("S01", true) ||
-            title.contains("S02", true)
+            title.contains("S02", true) ||
+            title.contains("TV", true)
         ) {
             TvType.TvSeries
         } else {
@@ -99,7 +99,7 @@ class Pahe : MainAPI() {
             href,
             type
         ) {
-            posterUrl = fixUrlNull(poster)
+            posterUrl = poster
         }
     }
 
@@ -115,7 +115,9 @@ class Pahe : MainAPI() {
             headers = headers
         ).document
 
-        val home = doc.select("div.bsx").mapNotNull {
+        val home = doc.select(
+            "div.bsx, article, div.post-item, div.item, div.grid-item"
+        ).mapNotNull {
             it.toSearchResult()
         }.distinctBy {
             it.url
@@ -138,7 +140,9 @@ class Pahe : MainAPI() {
             headers = headers
         ).document
 
-        return doc.select("div.bsx").mapNotNull {
+        return doc.select(
+            "div.bsx, article, div.post-item, div.item, div.grid-item"
+        ).mapNotNull {
             it.toSearchResult()
         }.distinctBy {
             it.url
@@ -170,15 +174,15 @@ class Pahe : MainAPI() {
             .trim()
 
         val poster = doc.selectFirst(
-            "div.entry-content img, img"
+            "div.entry-content img, .thumb img, img"
         )?.attr("src")
 
         val plot = doc.selectFirst(
-            "div.entry-content p"
+            "div.entry-content p, .entry-content p"
         )?.text()?.trim()
 
         val tags = doc.select(
-            "a[rel=category tag], a[href*=genre]"
+            "a[rel=category tag], a[href*=category]"
         ).map {
             it.text()
         }.filter {
@@ -205,7 +209,7 @@ class Pahe : MainAPI() {
             type,
             url
         ) {
-            posterUrl = fixUrlNull(poster)
+            posterUrl = poster
             this.plot = plot
             this.tags = tags
             this.year = year
