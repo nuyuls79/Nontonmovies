@@ -28,10 +28,10 @@ class Pahe : MainAPI() {
     )
 
     override val mainPage = mainPageOf(
-    
+
         // TERBARU
         "$mainUrl/page/" to "🔥 Terbaru",
-    
+
         // MOVIE GENRE
         "$mainUrl/category/action/page/" to "🎬 Action",
         "$mainUrl/category/adventure/page/" to "🗺 Adventure",
@@ -45,11 +45,11 @@ class Pahe : MainAPI() {
         "$mainUrl/category/romance/page/" to "❤️ Romance",
         "$mainUrl/category/sci-fi/page/" to "🚀 Sci-Fi",
         "$mainUrl/category/thriller/page/" to "🔪 Thriller",
-    
+
         // TV SHOW
         "$mainUrl/tv-show/page/" to "📺 TV Show",
         "$mainUrl/tv-show/ongoing/page/" to "📡 Ongoing TV",
-    
+
         // DRAMA
         "$mainUrl/korean-drama/page/" to "🇰🇷 Korean Drama",
         "$mainUrl/japanese-drama/page/" to "🇯🇵 Japanese Drama",
@@ -57,7 +57,7 @@ class Pahe : MainAPI() {
         "$mainUrl/thai-drama/page/" to "🇹🇭 Thai Drama",
         "$mainUrl/indian-drama/page/" to "🇮🇳 Indian Drama",
         "$mainUrl/turkish-drama/page/" to "🇹🇷 Turkish Drama",
-    
+
         // ANIME
         "$mainUrl/anime/movie/page/" to "🎌 Anime Movie",
         "$mainUrl/anime/tv/page/" to "📺 Anime TV"
@@ -65,25 +65,23 @@ class Pahe : MainAPI() {
 
     private fun Element.toSearchResult(): SearchResponse? {
 
-        val linkElement = selectFirst("a") ?: return null
+        val title = selectFirst(".tt")
+            ?.text()
+            ?.trim()
+            ?: return null
 
-        val title = (
-            selectFirst(".tt, .entry-title, h1, h2, h3")
-                ?.text()
-                ?: linkElement.attr("title")
-        ).trim()
+        val href = selectFirst("a")
+            ?.attr("href")
+            ?: return null
 
-        if (title.isBlank()) return null
-
-        val href = linkElement.attr("href")
-
-        val poster = selectFirst("img")?.let {
-            it.attr("data-src").ifBlank {
-                it.attr("data-lazy-src").ifBlank {
-                    it.attr("src")
+        val poster = selectFirst("img")
+            ?.let {
+                it.attr("data-src").ifBlank {
+                    it.attr("data-lazy-src").ifBlank {
+                        it.attr("src")
+                    }
                 }
             }
-        }
 
         val type = if (
             title.contains("Season", true) ||
@@ -117,9 +115,7 @@ class Pahe : MainAPI() {
             headers = headers
         ).document
 
-        val home = doc.select(
-            "div.bs, div.bsx, div.listupd article, article"
-        ).mapNotNull {
+        val home = doc.select("div.bsx").mapNotNull {
             it.toSearchResult()
         }.distinctBy {
             it.url
@@ -142,9 +138,7 @@ class Pahe : MainAPI() {
             headers = headers
         ).document
 
-        return doc.select(
-            "div.bs, div.bsx, div.listupd article, article"
-        ).mapNotNull {
+        return doc.select("div.bsx").mapNotNull {
             it.toSearchResult()
         }.distinctBy {
             it.url
