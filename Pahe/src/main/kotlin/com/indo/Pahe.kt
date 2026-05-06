@@ -60,68 +60,80 @@ class Pahe : MainAPI() {
         "$mainUrl/anime/" to "🎌 Anime"
     )
 
-    private fun Element.toSearchResult(): SearchResponse? {
+    private fun parseResults(
+        doc: org.jsoup.nodes.Document
+    ): List<SearchResponse> {
 
-        val linkElement = selectFirst("a[href]")
-            ?: return null
+        val results = ArrayList<SearchResponse>()
 
-        val href = linkElement.attr("href")
-            .trim()
+        val links = doc.select("a[href]")
 
-        if (!href.startsWith(mainUrl))
-            return null
+        links.forEach { a ->
 
-        val title = selectFirst(
-            """
-            .tt,
-            .entry-title,
-            h1,
-            h2,
-            h3,
-            img
-            """.trimIndent()
-        )?.let {
+            val href = a.attr("href").trim()
 
-            when (it.tagName()) {
-                "img" -> it.attr("alt")
-                else -> it.text()
+            // hanya ambil post movie asli
+            val isMoviePost = Regex(
+                "^https://pahe\\.ink/.+-\\d{4}.+/$"
+            ).containsMatchIn(href)
+
+            if (!isMoviePost)
+                return@forEach
+
+            var title = a.attr("title").trim()
+
+            val img = a.selectFirst("img")
+                ?: a.parent()?.selectFirst("img")
+
+            if (title.isBlank()) {
+
+                title = img?.attr("alt")
+                    ?.trim()
+                    ?: a.text().trim()
             }
 
-        }?.trim()
-            ?.replace("\n", " ")
-            ?: return null
+            // fallback dari slug url
+            if (title.isBlank()) {
 
-        if (title.length < 2)
-            return null
+                title = href
+                    .removeSuffix("/")
+                    .substringAfterLast("/")
+                    .replace("-", " ")
+            }
 
-        val poster = selectFirst("img")
-            ?.let {
-                it.attr("data-src").ifBlank {
-                    it.attr("data-lazy-src").ifBlank {
-                        it.attr("src").ifBlank {
-                            it.attr("data-cfsrc")
-                        }
-                    }
+            if (title.isBlank())
+                return@forEach
+
+            val poster = img?.attr("data-src")
+                ?.ifBlank {
+                    img.attr("data-lazy-src")
                 }
+                ?.ifBlank {
+                    img.attr("src")
+                }
+
+            val type = if (
+                title.contains("Season", true) ||
+                title.contains("Episode", true) ||
+                title.contains("S0", true)
+            ) {
+                TvType.TvSeries
+            } else {
+                TvType.Movie
             }
 
-        val type = if (
-            title.contains("Season", true) ||
-            title.contains("Episode", true) ||
-            title.contains("TV", true)
-        ) {
-            TvType.TvSeries
-        } else {
-            TvType.Movie
+            results.add(
+                newMovieSearchResponse(
+                    title,
+                    href,
+                    type
+                ) {
+                    posterUrl = poster
+                }
+            )
         }
 
-        return newMovieSearchResponse(
-            title,
-            href,
-            type
-        ) {
-            posterUrl = poster
-        }
+        return results.distinctBy { it.url }
     }
 
     override suspend fun getMainPage(
@@ -129,9 +141,12 @@ class Pahe : MainAPI() {
         request: MainPageRequest
     ): HomePageResponse {
 
-        val url = if (request.data.contains("/page/")) {
+        val url = if (
+            request.data.contains("/page/")
+        ) {
             request.data + page
         } else {
+
             if (page == 1) {
                 request.data
             } else {
@@ -144,26 +159,9 @@ class Pahe : MainAPI() {
             headers = headers
         ).document
 
-        val home = doc.select(
-            """
-            article,
-            article.post,
-            div.post,
-            div.bs,
-            div.bsx,
-            div.result-item,
-            div.listupd article,
-            li
-            """.trimIndent()
-        ).mapNotNull {
-            it.toSearchResult()
-        }.distinctBy {
-            it.url
-        }
-
         return newHomePageResponse(
             request.name,
-            home
+            parseResults(doc)
         )
     }
 
@@ -171,26 +169,12 @@ class Pahe : MainAPI() {
         query: String
     ): List<SearchResponse> {
 
-        val fixedQuery = query.replace(" ", "+")
-
         val doc = app.get(
-            "$mainUrl/?s=$fixedQuery",
+            "$mainUrl/?s=${query.replace(" ", "+")}",
             headers = headers
         ).document
 
-        return doc.select(
-            """
-            article,
-            article.post,
-            div.post,
-            div.bs,
-            div.bsx
-            """.trimIndent()
-        ).mapNotNull {
-            it.toSearchResult()
-        }.distinctBy {
-            it.url
-        }
+        return parseResults(doc)
     }
 
     override suspend fun load(
