@@ -133,8 +133,10 @@ class Pahe : MainAPI() {
         query: String
     ): List<SearchResponse> {
 
+        val fixedQuery = query.replace(" ", "+")
+
         val doc = app.get(
-            "$mainUrl/?s=${query.encodeUri()}",
+            "$mainUrl/?s=$fixedQuery",
             headers = headers
         ).document
 
