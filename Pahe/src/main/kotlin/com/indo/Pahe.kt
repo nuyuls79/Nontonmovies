@@ -32,19 +32,8 @@ class Pahe : MainAPI() {
         // TERBARU
         "$mainUrl/page/" to "🔥 Terbaru",
 
-        // MOVIE GENRE
-        "$mainUrl/movie-by-genre/action/page/" to "🎬 Action",
-        "$mainUrl/movie-by-genre/adventure/page/" to "🗺 Adventure",
-        "$mainUrl/movie-by-genre/animation/page/" to "🧸 Animation",
-        "$mainUrl/movie-by-genre/comedy/page/" to "😂 Comedy",
-        "$mainUrl/movie-by-genre/crime/page/" to "🕵 Crime",
-        "$mainUrl/movie-by-genre/drama/page/" to "🎭 Drama",
-        "$mainUrl/movie-by-genre/fantasy/page/" to "🧙 Fantasy",
-        "$mainUrl/movie-by-genre/horror/page/" to "👻 Horror",
-        "$mainUrl/movie-by-genre/mystery/page/" to "❓ Mystery",
-        "$mainUrl/movie-by-genre/romance/page/" to "❤️ Romance",
-        "$mainUrl/movie-by-genre/sci-fi/page/" to "🚀 Sci-Fi",
-        "$mainUrl/movie-by-genre/thriller/page/" to "🔪 Thriller",
+        // MOVIES
+        "$mainUrl/movie/page/" to "🎬 Movies",
 
         // TV SHOW
         "$mainUrl/tv-show/page/" to "📺 TV Show",
@@ -66,7 +55,7 @@ class Pahe : MainAPI() {
     private fun Element.toSearchResult(): SearchResponse? {
 
         val title = selectFirst(
-            "h1 a, h2 a, h3 a"
+            "h1 a, h2 a, h3 a, .entry-title a"
         )?.text()?.trim()
             ?: return null
 
@@ -99,7 +88,7 @@ class Pahe : MainAPI() {
             href,
             type
         ) {
-            posterUrl = poster
+            posterUrl = fixUrlNull(poster)
         }
     }
 
@@ -116,7 +105,7 @@ class Pahe : MainAPI() {
         ).document
 
         val home = doc.select(
-            "article, div.post-item, div.blog-items, div.grid-item"
+            "article, div.post-item, div.blog-items, div.grid-item, div.item"
         ).mapNotNull {
             it.toSearchResult()
         }.distinctBy {
@@ -141,7 +130,7 @@ class Pahe : MainAPI() {
         ).document
 
         return doc.select(
-            "article, div.post-item, div.blog-items, div.grid-item"
+            "article, div.post-item, div.blog-items, div.grid-item, div.item"
         ).mapNotNull {
             it.toSearchResult()
         }.distinctBy {
@@ -209,7 +198,7 @@ class Pahe : MainAPI() {
             type,
             url
         ) {
-            posterUrl = poster
+            posterUrl = fixUrlNull(poster)
             this.plot = plot
             this.tags = tags
             this.year = year
