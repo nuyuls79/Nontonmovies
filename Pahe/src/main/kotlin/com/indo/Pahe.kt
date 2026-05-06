@@ -7,13 +7,9 @@ import org.jsoup.nodes.Element
 class Pahe : MainAPI() {
 
     override var mainUrl = "https://pahe.ink"
-
     override var name = "Pahe"
-
     override val hasMainPage = true
-
     override var lang = "id"
-
     override val hasDownloadSupport = true
 
     override val supportedTypes = setOf(
@@ -29,10 +25,8 @@ class Pahe : MainAPI() {
 
     override val mainPage = mainPageOf(
 
-        // TERBARU
         "$mainUrl/page/" to "🔥 Terbaru",
 
-        // MOVIES
         "$mainUrl/action/" to "🎬 Action",
         "$mainUrl/adventure/" to "🗺 Adventure",
         "$mainUrl/animation/" to "🧸 Animation",
@@ -46,76 +40,71 @@ class Pahe : MainAPI() {
         "$mainUrl/sci-fi/" to "🚀 Sci-Fi",
         "$mainUrl/thriller/" to "🔪 Thriller",
 
-        // TV
         "$mainUrl/tv-shows/" to "📺 TV Shows",
 
-        // DRAMA
         "$mainUrl/korean-drama/" to "🇰🇷 Korean Drama",
-        "$mainUrl/chinese-drama/" to "🇨🇳 Chinese Drama",
         "$mainUrl/japanese-drama/" to "🇯🇵 Japanese Drama",
+        "$mainUrl/chinese-drama/" to "🇨🇳 Chinese Drama",
         "$mainUrl/thai-drama/" to "🇹🇭 Thai Drama",
-        "$mainUrl/indian-drama/" to "🇮🇳 Indian Drama",
-
-        // ANIME
-        "$mainUrl/anime/" to "🎌 Anime"
+        "$mainUrl/indian-drama/" to "🇮🇳 Indian Drama"
     )
 
-    private fun parseResults(
-        doc: org.jsoup.nodes.Document
-    ): List<SearchResponse> {
+    private fun parseResults(document: org.jsoup.nodes.Document): List<SearchResponse> {
 
-        val results = ArrayList<SearchResponse>()
+        val results = mutableListOf<SearchResponse>()
 
-        val links = doc.select("a[href]")
+        val containers = document.select(
+            "article, li, div.post, div.item, div.type-post"
+        )
 
-        links.forEach { a ->
+        for (item in containers) {
 
-            val href = a.attr("href").trim()
+            val aTag = item.selectFirst("a[href]") ?: continue
 
-            // hanya ambil post movie asli
-            val isMoviePost = Regex(
-                "^https://pahe\\.ink/.+-\\d{4}.+/$"
-            ).containsMatchIn(href)
+            val href = aTag.attr("href")
+            if (!href.startsWith(mainUrl)) continue
 
-            if (!isMoviePost)
-                return@forEach
-
-            var title = a.attr("title").trim()
-
-            val img = a.selectFirst("img")
-                ?: a.parent()?.selectFirst("img")
-
-            if (title.isBlank()) {
-
-                title = img?.attr("alt")
+            val title =
+                item.selectFirst("h1, h2, h3, h4, .entry-title, .post-title")
+                    ?.text()
                     ?.trim()
-                    ?: a.text().trim()
-            }
+                    ?: aTag.attr("title")
+                        .ifBlank { aTag.text().trim() }
 
-            // fallback dari slug url
-            if (title.isBlank()) {
+            if (title.isBlank()) continue
 
-                title = href
-                    .removeSuffix("/")
-                    .substringAfterLast("/")
-                    .replace("-", " ")
-            }
+            val img = item.selectFirst("img")
 
-            if (title.isBlank())
-                return@forEach
+            val poster = when {
+                img == null -> null
 
-            val poster = img?.attr("data-src")
-                ?.ifBlank {
+                img.attr("data-src").isNotBlank() ->
+                    img.attr("data-src")
+
+                img.attr("data-lazy-src").isNotBlank() ->
                     img.attr("data-lazy-src")
-                }
-                ?.ifBlank {
+
+                img.attr("data-lazy-loaded").isNotBlank() ->
+                    img.attr("data-lazy-loaded")
+
+                img.attr("srcset").isNotBlank() ->
+                    img.attr("srcset")
+                        .split(",")
+                        .firstOrNull()
+                        ?.trim()
+                        ?.split(" ")
+                        ?.firstOrNull()
+
+                img.attr("src").isNotBlank() ->
                     img.attr("src")
-                }
+
+                else -> null
+            }
 
             val type = if (
                 title.contains("Season", true) ||
                 title.contains("Episode", true) ||
-                title.contains("S0", true)
+                title.contains("TV", true)
             ) {
                 TvType.TvSeries
             } else {
@@ -128,7 +117,7 @@ class Pahe : MainAPI() {
                     href,
                     type
                 ) {
-                    posterUrl = poster
+                    posterUrl = fixUrlNull(poster)
                 }
             )
         }
@@ -146,12 +135,7 @@ class Pahe : MainAPI() {
         ) {
             request.data + page
         } else {
-
-            if (page == 1) {
-                request.data
-            } else {
-                request.data + "page/$page/"
-            }
+            request.data
         }
 
         val doc = app.get(
@@ -159,9 +143,11 @@ class Pahe : MainAPI() {
             headers = headers
         ).document
 
+        val home = parseResults(doc)
+
         return newHomePageResponse(
             request.name,
-            parseResults(doc)
+            home
         )
     }
 
@@ -169,8 +155,10 @@ class Pahe : MainAPI() {
         query: String
     ): List<SearchResponse> {
 
+        val fixedQuery = query.replace(" ", "+")
+
         val doc = app.get(
-            "$mainUrl/?s=${query.replace(" ", "+")}",
+            "$mainUrl/?s=$fixedQuery",
             headers = headers
         ).document
 
@@ -201,16 +189,29 @@ class Pahe : MainAPI() {
             )
             .trim()
 
-        val poster = doc.selectFirst(
-            "div.entry-content img, img"
-        )?.attr("src")
+        val posterImg = doc.selectFirst("img")
+
+        val poster = when {
+            posterImg == null -> null
+
+            posterImg.attr("data-src").isNotBlank() ->
+                posterImg.attr("data-src")
+
+            posterImg.attr("data-lazy-src").isNotBlank() ->
+                posterImg.attr("data-lazy-src")
+
+            posterImg.attr("src").isNotBlank() ->
+                posterImg.attr("src")
+
+            else -> null
+        }
 
         val plot = doc.selectFirst(
-            "div.entry-content p"
+            ".entry-content p, p"
         )?.text()?.trim()
 
         val tags = doc.select(
-            "a[rel=category tag], a[href*=genre]"
+            "a[rel=category tag], a[href*=category]"
         ).map {
             it.text()
         }.filter {
@@ -237,7 +238,7 @@ class Pahe : MainAPI() {
             type,
             url
         ) {
-            posterUrl = poster
+            posterUrl = fixUrlNull(poster)
             this.plot = plot
             this.tags = tags
             this.year = year
