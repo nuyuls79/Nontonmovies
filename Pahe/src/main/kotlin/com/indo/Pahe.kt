@@ -2,7 +2,7 @@ package com.indo
 
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
-import org.jsoup.nodes.Element
+import org.jsoup.nodes.Document
 
 class Pahe : MainAPI() {
 
@@ -49,7 +49,7 @@ class Pahe : MainAPI() {
         "$mainUrl/indian-drama/" to "🇮🇳 Indian Drama"
     )
 
-    private fun parseResults(document: org.jsoup.nodes.Document): List<SearchResponse> {
+    private fun parseResults(document: Document): List<SearchResponse> {
 
         val results = mutableListOf<SearchResponse>()
 
@@ -61,44 +61,73 @@ class Pahe : MainAPI() {
 
             val aTag = item.selectFirst("a[href]") ?: continue
 
-            val href = aTag.attr("href")
-            if (!href.startsWith(mainUrl)) continue
+            val href = aTag.attr("href").trim()
+
+            if (!href.startsWith(mainUrl))
+                continue
 
             val title =
-                item.selectFirst("h1, h2, h3, h4, .entry-title, .post-title")
-                    ?.text()
-                    ?.trim()
+                item.selectFirst(
+                    "h1, h2, h3, h4, .entry-title, .post-title"
+                )?.text()?.trim()
                     ?: aTag.attr("title")
-                        .ifBlank { aTag.text().trim() }
+                        .ifBlank {
+                            aTag.text().trim()
+                        }
 
-            if (title.isBlank()) continue
+            if (title.isBlank())
+                continue
 
             val img = item.selectFirst("img")
 
-            val poster = when {
-                img == null -> null
+            var poster: String? = null
 
-                img.attr("data-src").isNotBlank() ->
-                    img.attr("data-src")
+            if (img != null) {
 
-                img.attr("data-lazy-src").isNotBlank() ->
-                    img.attr("data-lazy-src")
+                poster = when {
 
-                img.attr("data-lazy-loaded").isNotBlank() ->
-                    img.attr("data-lazy-loaded")
+                    img.attr("data-src").isNotBlank() ->
+                        img.attr("data-src")
 
-                img.attr("srcset").isNotBlank() ->
-                    img.attr("srcset")
-                        .split(",")
-                        .firstOrNull()
-                        ?.trim()
-                        ?.split(" ")
-                        ?.firstOrNull()
+                    img.attr("data-lazy-src").isNotBlank() ->
+                        img.attr("data-lazy-src")
 
-                img.attr("src").isNotBlank() ->
-                    img.attr("src")
+                    img.attr("data-lazy-loaded").isNotBlank() ->
+                        img.attr("data-lazy-loaded")
 
-                else -> null
+                    img.attr("data-original").isNotBlank() ->
+                        img.attr("data-original")
+
+                    img.attr("srcset").isNotBlank() ->
+                        img.attr("srcset")
+                            .split(",")
+                            .firstOrNull()
+                            ?.trim()
+                            ?.split(" ")
+                            ?.firstOrNull()
+
+                    img.attr("src").isNotBlank() &&
+                            !img.attr("src").contains("data:image") ->
+                        img.attr("src")
+
+                    else -> null
+                }
+            }
+
+            // fallback background-image
+            if (poster.isNullOrBlank()) {
+
+                val style = item.attr("style")
+
+                val match = Regex(
+                    """url\((.*?)\)"""
+                ).find(style)
+
+                poster = match
+                    ?.groupValues
+                    ?.getOrNull(1)
+                    ?.replace("\"", "")
+                    ?.replace("'", "")
             }
 
             val type = if (
@@ -122,7 +151,9 @@ class Pahe : MainAPI() {
             )
         }
 
-        return results.distinctBy { it.url }
+        return results.distinctBy {
+            it.url
+        }
     }
 
     override suspend fun getMainPage(
@@ -192,6 +223,7 @@ class Pahe : MainAPI() {
         val posterImg = doc.selectFirst("img")
 
         val poster = when {
+
             posterImg == null -> null
 
             posterImg.attr("data-src").isNotBlank() ->
@@ -251,19 +283,18 @@ class Pahe : MainAPI() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ): Boolean {
-    
+
         val doc = app.get(
             data,
             headers = headers
         ).document
-    
+
         val links = mutableSetOf<String>()
-    
-        // ambil semua href
+
         doc.select("a[href]").forEach { element ->
-    
+
             val href = element.attr("href").trim()
-    
+
             if (
                 href.contains("pixeldrain", true) ||
                 href.contains("mega.nz", true) ||
@@ -282,50 +313,56 @@ class Pahe : MainAPI() {
                 href.contains("mixdrop", true) ||
                 href.contains("mp4upload", true)
             ) {
-                links.add(fixUrl(href))
+                links.add(
+                    fixUrl(href)
+                )
             }
         }
-    
-        // iframe support
+
         doc.select("iframe[src]").forEach {
-    
+
             val src = it.attr("src").trim()
-    
+
             if (src.isNotBlank()) {
-                links.add(fixUrl(src))
+                links.add(
+                    fixUrl(src)
+                )
             }
         }
-    
-        // redirect page support
-        doc.select("button[onclick], div[onclick]").forEach {
-    
+
+        doc.select(
+            "button[onclick], div[onclick]"
+        ).forEach {
+
             val onclick = it.attr("onclick")
-    
-            Regex("""https?:\/\/[^\s'"]+""")
-                .findAll(onclick)
+
+            Regex(
+                """https?:\/\/[^\s'"]+"""
+            ).findAll(onclick)
                 .forEach { match ->
                     links.add(match.value)
                 }
         }
-    
+
         if (links.isEmpty()) {
             return false
         }
-    
+
         links.forEach { link ->
-    
+
             try {
-    
+
                 loadExtractor(
                     link,
                     data,
                     subtitleCallback,
                     callback
                 )
-    
+
             } catch (_: Exception) {
             }
         }
-    
-     return true
+
+        return true
+    }
 }
