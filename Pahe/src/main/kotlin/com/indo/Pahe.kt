@@ -28,11 +28,39 @@ class Pahe : MainAPI() {
     )
 
     override val mainPage = mainPageOf(
+    
+        // TERBARU
         "$mainUrl/page/" to "🔥 Terbaru",
-        "$mainUrl/movie/page/" to "🎬 Movies",
+    
+        // MOVIE GENRE
+        "$mainUrl/category/action/page/" to "🎬 Action",
+        "$mainUrl/category/adventure/page/" to "🗺 Adventure",
+        "$mainUrl/category/animation/page/" to "🧸 Animation",
+        "$mainUrl/category/comedy/page/" to "😂 Comedy",
+        "$mainUrl/category/crime/page/" to "🕵 Crime",
+        "$mainUrl/category/drama/page/" to "🎭 Drama",
+        "$mainUrl/category/fantasy/page/" to "🧙 Fantasy",
+        "$mainUrl/category/horror/page/" to "👻 Horror",
+        "$mainUrl/category/mystery/page/" to "❓ Mystery",
+        "$mainUrl/category/romance/page/" to "❤️ Romance",
+        "$mainUrl/category/sci-fi/page/" to "🚀 Sci-Fi",
+        "$mainUrl/category/thriller/page/" to "🔪 Thriller",
+    
+        // TV SHOW
         "$mainUrl/tv-show/page/" to "📺 TV Show",
-        "$mainUrl/anime/page/" to "🎌 Anime",
-        "$mainUrl/k-drama/page/" to "🇰🇷 K-Drama"
+        "$mainUrl/tv-show/ongoing/page/" to "📡 Ongoing TV",
+    
+        // DRAMA
+        "$mainUrl/korean-drama/page/" to "🇰🇷 Korean Drama",
+        "$mainUrl/japanese-drama/page/" to "🇯🇵 Japanese Drama",
+        "$mainUrl/chinese-drama/page/" to "🇨🇳 Chinese Drama",
+        "$mainUrl/thai-drama/page/" to "🇹🇭 Thai Drama",
+        "$mainUrl/indian-drama/page/" to "🇮🇳 Indian Drama",
+        "$mainUrl/turkish-drama/page/" to "🇹🇷 Turkish Drama",
+    
+        // ANIME
+        "$mainUrl/anime/movie/page/" to "🎌 Anime Movie",
+        "$mainUrl/anime/tv/page/" to "📺 Anime TV"
     )
 
     private fun Element.toSearchResult(): SearchResponse? {
