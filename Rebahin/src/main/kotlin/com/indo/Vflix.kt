@@ -1,8 +1,6 @@
 package com.indo
 
 import com.lagradost.cloudstream3.*
-import com.lagradost.cloudstream3.utils.ExtractorLink
-import com.lagradost.cloudstream3.utils.Qualities
 import com.lagradost.cloudstream3.utils.newExtractorLink
 import org.jsoup.nodes.Element
 
@@ -237,56 +235,40 @@ class VFlix : MainAPI() {
         callback: (ExtractorLink) -> Unit
     ): Boolean {
 
-        val doc = app.get(data).document
+        val html =
+            app.get(data).text
 
-        // =========================
-        // Cari API video
-        // =========================
+        val playerUrl =
+            Regex("""content":"(https:\\/\\/moviexstream[^"]+)""")
+                .find(html)
+                ?.groupValues
+                ?.get(1)
+                ?.replace("\\/", "/")
+                ?: return false
 
-        val api =
-            Regex("""https:\/\/moviexstream\.strp2p\.live\/api\/v1\/video\?id=[^"' ]+""")
-                .find(doc.html())
-                ?.value
-
-        if (api == null) {
-            return false
-        }
-
-        // =========================
-        // Request API
-        // =========================
-
-        val apiResponse = app.get(
-            api,
-            referer = mainUrl,
-            headers = mapOf(
-                "Origin" to "https://moviexstream.strp2p.live",
-                "Referer" to "https://moviexstream.strp2p.live/"
-            )
-        ).text
-
-        // =========================
-        // Cari m3u8
-        // =========================
+        val playerHtml =
+            app.get(
+                playerUrl,
+                referer = data
+            ).text
 
         val m3u8 =
             Regex("""https?:\/\/[^"' ]+\.m3u8[^"' ]*""")
-                .find(apiResponse)
+                .find(playerHtml)
                 ?.value
 
         if (m3u8 != null) {
 
-        callback.invoke(
-            newExtractorLink(
-                source = "VFlix",
-                name = "VFlix HLS",
-                url = m3u8
-            ) {
-                this.referer = "https://moviexstream.strp2p.live/"
-                this.quality = Qualities.P1080.value
-                this.isM3u8 = true
-            }
-        )
+            callback.invoke(
+                newExtractorLink(
+                    source = "VFlix",
+                    name = "VFlix HLS",
+                    url = m3u8
+                ) {
+                    referer = "https://moviexstream.strp2p.live/"
+                    isM3u8 = true
+                }
+            )
 
             return true
         }
