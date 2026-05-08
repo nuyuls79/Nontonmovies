@@ -3,6 +3,7 @@ package com.indo
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.ExtractorLink
 import com.lagradost.cloudstream3.utils.Qualities
+import com.lagradost.cloudstream3.utils.newExtractorLink
 import org.jsoup.nodes.Element
 
 class VFlix : MainAPI() {
@@ -275,16 +276,17 @@ class VFlix : MainAPI() {
 
         if (m3u8 != null) {
 
-            callback.invoke(
-                ExtractorLink(
-                    source = "VFlix",
-                    name = "VFlix HLS",
-                    url = m3u8,
-                    referer = "https://moviexstream.strp2p.live/",
-                    quality = Qualities.P1080.value,
-                    isM3u8 = true
-                )
-            )
+        callback.invoke(
+            newExtractorLink(
+                source = "VFlix",
+                name = "VFlix HLS",
+                url = m3u8
+            ) {
+                this.referer = "https://moviexstream.strp2p.live/"
+                this.quality = Qualities.P1080.value
+                this.isM3u8 = true
+            }
+        )
 
             return true
         }
