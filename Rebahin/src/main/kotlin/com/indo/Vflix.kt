@@ -2,6 +2,7 @@ package com.indo
 
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.ExtractorLink
+import com.lagradost.cloudstream3.utils.ExtractorLinkType
 import org.jsoup.nodes.Element
 
 class VFlix : MainAPI() {
@@ -235,30 +236,33 @@ class VFlix : MainAPI() {
         callback: (ExtractorLink) -> Unit
     ): Boolean {
 
-        val html =
-            app.get(data).text
+        val doc = app.get(data).document
 
         // =========================
-        // Ambil playerSources
+        // Cari API video
         // =========================
 
-        val playerUrl =
-            Regex("""content":"(https:\\/\\/moviexstream[^"]+)""")
-                .find(html)
-                ?.groupValues
-                ?.get(1)
-                ?.replace("\\/", "/")
-                ?: return false
+        val api =
+            Regex("""https:\/\/moviexstream\.strp2p\.live\/api\/v1\/video\?id=[^"' ]+""")
+                .find(doc.html())
+                ?.value
+
+        if (api == null) {
+            return false
+        }
 
         // =========================
-        // Ambil halaman player
+        // Request API
         // =========================
 
-        val playerHtml =
-            app.get(
-                playerUrl,
-                referer = data
-            ).text
+        val apiResponse = app.get(
+            api,
+            referer = mainUrl,
+            headers = mapOf(
+                "Origin" to "https://moviexstream.strp2p.live",
+                "Referer" to "https://moviexstream.strp2p.live/"
+            )
+        ).text
 
         // =========================
         // Cari m3u8
@@ -266,7 +270,7 @@ class VFlix : MainAPI() {
 
         val m3u8 =
             Regex("""https?:\/\/[^"' ]+\.m3u8[^"' ]*""")
-                .find(playerHtml)
+                .find(apiResponse)
                 ?.value
 
         if (m3u8 != null) {
@@ -278,7 +282,7 @@ class VFlix : MainAPI() {
                     url = m3u8,
                     referer = "https://moviexstream.strp2p.live/",
                     quality = Qualities.P1080.value,
-                    type = INFER_TYPE,
+                    type = ExtractorLinkType.M3U8,
                     isM3u8 = true
                 )
             )
