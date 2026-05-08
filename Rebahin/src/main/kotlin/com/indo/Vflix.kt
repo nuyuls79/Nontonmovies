@@ -2,7 +2,6 @@ package com.indo
 
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.ExtractorLink
-import com.lagradost.cloudstream3.utils.ExtractorLinkType
 import com.lagradost.cloudstream3.utils.Qualities
 import org.jsoup.nodes.Element
 
@@ -283,7 +282,6 @@ class VFlix : MainAPI() {
                     url = m3u8,
                     referer = "https://moviexstream.strp2p.live/",
                     quality = Qualities.P1080.value,
-                    type = ExtractorLinkType.M3U8,
                     isM3u8 = true
                 )
             )
